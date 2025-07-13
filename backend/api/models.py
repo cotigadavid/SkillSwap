@@ -5,8 +5,8 @@ from django.contrib.auth.models import AbstractUser
 
 class Skill(models.Model):
     title = models.CharField(max_length=20)
-    difficulty = models.CharField(max_length=20)
-    hours_nedded = models.IntegerField(blank=True, null=True)
+    difficulty = models.CharField(max_length=20, options=[('easy', 'Easy'), ('medium', 'Medium'), ('hard', 'Hard'), ('serious', 'Serious')])
+    hours_needed = models.IntegerField(blank=True, null=True)
 
     def __str__(self):
         return self.title
@@ -17,7 +17,7 @@ class CustomUser(AbstractUser):
     birth_date = models.DateField(blank=True, null=True)
     residing_city = models.CharField(max_length=50, blank=True, null=True)
     residing_county = models.CharField(max_length=50, blank=True, null=True)
-    skills = models.ManyToManyField(Skill, related_name='users')
+    skills = models.ManyToManyField(Skill, related_name='users', null=True, blank=True)
 
     def __str__(self):
         return self.username
