@@ -53,6 +53,13 @@ MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
 ]
 
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+}
+
+
 AUTH_USER_MODEL = "api.CustomUser"
 
 CORS_ALLOW_ALL_ORIGINS = True 
