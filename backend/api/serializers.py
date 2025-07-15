@@ -18,9 +18,8 @@ class SkillSerializer(serializers.ModelSerializer):
         hoursNeeded = data.get('hours_needed')
 
         if hoursNeeded is None:
-            raise serializers.ValidationError("Hours needed is required for difficulty validation.")
-
-
+            return data
+        
         if difficulty.lower() == 'easy':
             if hoursNeeded < 1 or hoursNeeded > 20:
                 raise serializers.ValidationError('Easy skills should require between 1 and 20 hours of practice')
@@ -45,7 +44,7 @@ class CustomUserSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def validate_phone_number(self, value):
-        if (value.length() != 10 or any(char.isdigit() == 0 for char in value)):
+        if (len(value) != 10 or any(not char.isdigit() for char in value)):
             raise serializers.ValidationError("Phone number must contain 10 digits")
         return value
     
@@ -65,5 +64,46 @@ class CustomUserSerializer(serializers.ModelSerializer):
 
         return value
     
+    def validate_residing_city(self, value):
+        if any(not char.isalpha() for char in value):
+            raise serializers.ValidationError("Residing city must only contain letter!")
+        
+    def validate_residing_county(self, value):
+        if any(not char.isalpha() for char in value):
+            raise serializers.ValidationError("Residing county must only contain letter!")
+
     def validate(self, data):
+        return data
+    
+
+class ConversationSerializer(serializers.ModelSerializer):
+    timestamp = serializers.ReadOnlyField()
+
+    class Meta:
+        model = Conversation
+        fields = '__all__'
+
+    def validate_participants(self, value):
+        if len(value) < 2:
+            raise serializers.ValidationError("A conversation must have at least 2 participants.")
+        return value
+    
+    def to_representation(self, instance):
+        rep = super().to_representation(instance)
+        rep['participants'] = [user.username for user in instance.participants.all()]
+        return rep
+
+
+class MessageSerializer(serializers.ModelSerializer):
+    timestamp = serializers.ReadOnlyField()
+
+    class Meta:
+        model = Message
+        fields = '__all__'
+
+    def validate(self, data):
+        conversation = data['conversation']
+        sender = data['sender']
+        if sender not in conversation.participants.all():
+            raise serializers.ValidationError("Sender must be a participant in the conversation.")
         return data

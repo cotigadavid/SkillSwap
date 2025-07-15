@@ -5,7 +5,7 @@ from django.contrib.auth.models import AbstractUser
 
 class Skill(models.Model):
     title = models.CharField(max_length=20)
-    difficulty = models.CharField(max_length=20, options=[('easy', 'Easy'), ('medium', 'Medium'), ('hard', 'Hard'), ('serious', 'Serious')])
+    difficulty = models.CharField(max_length=20, choices=[('easy', 'Easy'), ('medium', 'Medium'), ('hard', 'Hard'), ('serious', 'Serious')])
     hours_needed = models.IntegerField(blank=True, null=True)
 
     def __str__(self):
