@@ -1,8 +1,6 @@
 
 .LoginForm {
-    padding-top: 20px;
-    border: yellow 1px solid;  
-    
+    padding-top: 20px;    
 }
 
 input {
@@ -16,6 +14,11 @@ input {
     font-size: 1rem;
     border-radius: 5px;
 }
+
+input:focus {
+  outline: none;
+}
+
 
 label {
     margin-left: 10%;
@@ -37,3 +40,20 @@ label {
 .submitButton:hover {
     background-color: #FFF000
 }
+
+#pass {
+    width: 70%;
+    border-radius: 5px 0 0 5px;
+}
+
+#eye {
+    border: none;
+    margin-top: 0.5rem;
+    height: 2.65rem;
+    width: 10%;
+    border-radius: 0px 0px 5px;
+    margin-bottom: 1rem; 
+    transform: translateX(-2.5%) translateY(4px); 
+}
+
+

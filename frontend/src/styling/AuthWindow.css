@@ -3,31 +3,38 @@
     margin-top: 100px;
     height: auto;
     transform: translateY(0vh);
-    border: 1px solid black;
-}
-
-figure {
-    border: 1px solid red;
+    background-color: #FFDBDB;
 }
 
 .AuthWindow > button {
-    background-color: transparent;
+    background-color: lightgray;
     width: 40%;
     height: 10%;
     font-size: 1.5rem;
-    border: 1px solid blue;
+    border: none;
+    border-radius: 5px;
 }
 
-.AuthWindow:nth-child(2) {
-    margin-left: 5%;
+.AuthWindow > button.active {
+  background-color: #007bff; /* blue background */
+  color: white;
+  font-weight: bold;
+  border: 2px solid #007bff;
 }
 
-.AuthWindow:nth-child(3) {
-    margin-right: 5%;
+#log {
+    margin-left: 10%;
+}
+
+#sign {
+    margin-right: 10%;
+}
+
+.AuthWindow > button:hover{
+    background-color: #E0E0E0;
 }
 
 .FormContainer {
-    border: 1px solid green;
-    height: 50%;
+    height: 30%;
     width: 100%;
 }

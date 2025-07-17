@@ -5,6 +5,7 @@ const SignupForm = () => {
     const [email, setEmail] = useState('')
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [showPassword, setShowPassword] = useState('false')
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -12,6 +13,10 @@ const SignupForm = () => {
         console.log('Username:', username);
         console.log('Password:', password);
     };
+
+    const toggleShowPassword = () => {
+        setShowPassword(prev => !prev);
+    }
 
     return (
         <div className='LoginForm'>
@@ -36,13 +41,20 @@ const SignupForm = () => {
                 </div>
                 <div>
                     <label>Password</label>
-                    <input
-                        type="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
-                    />
+                    <div className='passCont'>
+                        <input
+                            id='pass'
+                            type={showPassword ? 'password' : 'text'}
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            required
+                        />
+                        <button type='button' id='eye' onClick={toggleShowPassword}>
+                        <img src={showPassword ? "/eye.png" : "/eye_closed.png"} width='20' height='20'/>
+                        </button>
+                    </div>
                 </div>
+                
                 <button type="submit" className='submitButton'>Sign up</button>
             </form>
         </div>
