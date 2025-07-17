@@ -1,10 +1,11 @@
 import '../styling/LoginForm.css';
 import { useState } from "react";
+import PasswordInput from './PasswordInput';
 
 const LoginForm = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    const [showPassword, setShowPassword] = useState('false');
+    const [showPassword, setShowPassword] = useState(false);
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -30,20 +31,14 @@ const LoginForm = () => {
                 </div>
                 <div>
                     <label>Password</label>
-                    <div className='passCont'>
-                        <input
-                            id='pass'
-                            type={showPassword ? 'password' : 'text'}
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            required
-                        />
-                        <button type='button' id='eye' onClick={toggleShowPassword}>
-                        <img src={showPassword ? "/eye.png" : "/eye_closed.png"} width='20' height='20'/>
-                        </button>
-                    </div>
+                    <PasswordInput
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        showPassword={showPassword}
+                        toggleShowPassword={toggleShowPassword}
+                    />
                 </div>
-                <button type="submit" className='submitButton'>Login</button>
+                <button type="submit" className='submitButton'>Log in</button>
             </form>
         </div>
     );

@@ -1,9 +1,8 @@
 import '../styling/AuthWindow.css';
-import './LoginForm'
-import LoginForm from './LoginForm';
-import './SignupForm'
 import { useState } from "react";
+import LoginForm from './LoginForm';
 import SignupForm from './SignupForm';
+import logo from '../assets/Logo1024.png';
 
 
 const AuthWindow = () => {
@@ -12,7 +11,7 @@ const AuthWindow = () => {
 
     return (
         <div className='AuthWindow'>
-            <figure><img src="/Logo1024.png" width="256" height="256" alt="Logo"></img></figure>
+            <figure><img src={logo} width="256" height="256" alt="Logo"></img></figure>
             <button type="button" id='log' 
                 className={selected === 'LogIn' ? 'active' : ''} 
                 onClick={() => setSelected('LogIn')}>Log in</button>

@@ -1,4 +1,4 @@
-
+/* 
 .AuthWindow {
     margin-top: 100px;
     height: auto;
@@ -16,7 +16,7 @@
 }
 
 .AuthWindow > button.active {
-  background-color: #007bff; /* blue background */
+  background-color: #007bff;
   color: white;
   font-weight: bold;
   border: 2px solid #007bff;
@@ -37,4 +37,41 @@
 .FormContainer {
     height: 30%;
     width: 100%;
+} */
+
+
+.AuthWindow {
+    margin-top: 100px;
+    background-color: #ffdbdb;
+    padding: 2rem 0;
+    text-align: center;
+}
+
+.AuthWindow > button {
+    background-color: lightgray;
+    width: 40%;
+    max-width: 200px;
+    height: 3rem;
+    font-size: 1.2rem;
+    border: none;
+    border-radius: 5px;
+    margin: 0 0.5rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.AuthWindow > button.active {
+    background-color: #007bff;
+    color: white;
+    font-weight: bold;
+    border: 2px solid #007bff;
+}
+
+.AuthWindow > button:hover {
+    background-color: #e0e0e0;
+}
+
+.FormContainer {
+    width: 100%;
+    margin-top: 2rem;
 }
