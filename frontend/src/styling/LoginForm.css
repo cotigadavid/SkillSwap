@@ -1,0 +1,39 @@
+
+.LoginForm {
+    padding-top: 20px;
+    border: yellow 1px solid;  
+    
+}
+
+input {
+    margin-top: 0.5rem;
+    margin-bottom: 1rem;
+    height: 2.5rem;
+    width: 80%;
+    margin-left: 10%;
+    border: none;
+    background-color: #F0F0F0;
+    font-size: 1rem;
+    border-radius: 5px;
+}
+
+label {
+    margin-left: 10%;
+}
+
+.submitButton {
+    margin-top: 5%;
+    background-color: #FFFF5E;
+    width: 80%;
+    height: 3rem;
+    font-size: 1.5rem;
+    border: none;
+    text-align: center;
+    margin-left: 10%;
+    margin-right: 10%;
+    border-radius: 5px;
+}
+
+.submitButton:hover {
+    background-color: #FFF000
+}

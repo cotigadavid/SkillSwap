@@ -1,0 +1,33 @@
+
+.AuthWindow {
+    margin-top: 100px;
+    height: auto;
+    transform: translateY(0vh);
+    border: 1px solid black;
+}
+
+figure {
+    border: 1px solid red;
+}
+
+.AuthWindow > button {
+    background-color: transparent;
+    width: 40%;
+    height: 10%;
+    font-size: 1.5rem;
+    border: 1px solid blue;
+}
+
+.AuthWindow:nth-child(2) {
+    margin-left: 5%;
+}
+
+.AuthWindow:nth-child(3) {
+    margin-right: 5%;
+}
+
+.FormContainer {
+    border: 1px solid green;
+    height: 50%;
+    width: 100%;
+}
