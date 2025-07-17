@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import BaseUserManager
 
 # Create your models here.
 
@@ -10,6 +11,16 @@ class Skill(models.Model):
 
     def __str__(self):
         return self.title
+    
+class CustomUserManager(BaseUserManager):
+    def create_user(self, username, email, password=None):
+        if not email:
+            raise ValueError("Email required.")
+        email = self.normalize_email(email)
+        user = self.model(username=username, email=email)
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
 
 
 class CustomUser(AbstractUser):
@@ -18,6 +29,8 @@ class CustomUser(AbstractUser):
     residing_city = models.CharField(max_length=50, blank=True, null=True)
     residing_county = models.CharField(max_length=50, blank=True, null=True)
     skills = models.ManyToManyField(Skill, related_name='users', null=True, blank=True)
+
+    objects = CustomUserManager()  
 
     def __str__(self):
         return self.username
