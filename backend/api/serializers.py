@@ -111,6 +111,11 @@ class MessageSerializer(serializers.ModelSerializer):
     
 
 class RegisterSerializer(serializers.ModelSerializer):
+        
+        class Meta:
+            model = CustomUser
+            fields = ('username', 'email', 'password')
+
         username = serializers.CharField(max_length=100)
         email = serializers.EmailField(required=True)
         password = serializers.CharField(write_only=True, min_length=6)
