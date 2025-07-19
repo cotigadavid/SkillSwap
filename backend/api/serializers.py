@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import Skill, CustomUser, Conversation, Message
 from datetime import date
+from .models import CustomUser
 
 class SkillSerializer(serializers.ModelSerializer):
     class Meta:
@@ -107,3 +108,32 @@ class MessageSerializer(serializers.ModelSerializer):
         if sender not in conversation.participants.all():
             raise serializers.ValidationError("Sender must be a participant in the conversation.")
         return data
+    
+
+class RegisterSerializer(serializers.ModelSerializer):
+        
+        class Meta:
+            model = CustomUser
+            fields = ('username', 'email', 'password')
+
+        username = serializers.CharField(max_length=100)
+        email = serializers.EmailField(required=True)
+        password = serializers.CharField(write_only=True, min_length=6)
+
+        def validate_username(self, value):
+            if CustomUser.objects.filter(username=value).exists():
+                raise serializers.ValidationError("Username exists already.")
+            return value
+        
+        def validate_email(self, value):
+            if CustomUser.objects.filter(email=value).exists():
+                raise serializers.ValidationError("Email already registered.")
+            return value
+
+        def create(self, validated_data):
+                user = CustomUser.objects.create_user(
+                    username=validated_data['username'],
+                    email=validated_data['email'],
+                    password=validated_data['password']
+                )
+                return user
