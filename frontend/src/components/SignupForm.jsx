@@ -9,11 +9,26 @@ const SignupForm = () => {
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         console.log('Email:', email);
         console.log('Username:', username);
         console.log('Password:', password);
+
+        const response = await fetch('http://localhost:8000/api/register/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                username: username,
+                email: email,
+                password: password
+            })
+        });
+
+        const data = await response.json();
+        console.log(data);
     };
 
     const toggleShowPassword = () => {
