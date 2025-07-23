@@ -4,14 +4,6 @@ from django.contrib.auth.models import BaseUserManager
 from datetime import date
 
 # Create your models here.
-
-class Skill(models.Model):
-    title = models.CharField(max_length=20)
-    difficulty = models.CharField(max_length=20, choices=[('easy', 'Easy'), ('medium', 'Medium'), ('hard', 'Hard'), ('serious', 'Serious')])
-    hours_needed = models.IntegerField(blank=True, null=True)
-
-    def __str__(self):
-        return self.title
     
 class CustomUserManager(BaseUserManager):
     def create_user(self, username, email, password=None):
@@ -23,14 +15,12 @@ class CustomUserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-
 class CustomUser(AbstractUser):
     profile_picture = models.ImageField(upload_to='profile_pictures/', blank=True, null=True)
     phone_number = models.CharField(max_length=10)
     birth_date = models.DateField(blank=True, null=True)
     residing_city = models.CharField(max_length=50, blank=True, null=True)
     residing_county = models.CharField(max_length=50, blank=True, null=True)
-    skills = models.ManyToManyField(Skill, related_name='users', null=True, blank=True)
 
     @property
     def age(self):
@@ -45,6 +35,14 @@ class CustomUser(AbstractUser):
     def __str__(self):
         return self.username
 
+class Skill(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="skills", null=True, blank=True)
+    title = models.CharField(max_length=20)
+    difficulty = models.CharField(max_length=20, choices=[('easy', 'Easy'), ('medium', 'Medium'), ('hard', 'Hard'), ('serious', 'Serious')])
+    hours_needed = models.IntegerField(blank=True, null=True)
+
+    def __str__(self):
+        return self.title
 
 class Conversation(models.Model):
     participants = models.ManyToManyField(CustomUser, related_name='conversations')
