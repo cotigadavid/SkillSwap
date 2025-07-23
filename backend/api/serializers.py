@@ -40,6 +40,12 @@ class SkillSerializer(serializers.ModelSerializer):
         return data
 
 class CustomUserSerializer(serializers.ModelSerializer):
+    skills = SkillSerializer(many=True)
+    age = serializers.SerializerMethodField()
+
+    def get_age(self, obj):
+        return obj.age
+
     class Meta:
         model = CustomUser
         fields = '__all__'
@@ -68,10 +74,12 @@ class CustomUserSerializer(serializers.ModelSerializer):
     def validate_residing_city(self, value):
         if any(not char.isalpha() for char in value):
             raise serializers.ValidationError("Residing city must only contain letter!")
+        return value
         
     def validate_residing_county(self, value):
         if any(not char.isalpha() for char in value):
             raise serializers.ValidationError("Residing county must only contain letter!")
+        return value
 
     def validate(self, data):
         return data
