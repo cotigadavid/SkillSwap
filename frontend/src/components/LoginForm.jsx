@@ -1,6 +1,7 @@
 import '../styling/LoginForm.css';
 import { useState } from "react";
 import PasswordInput from './PasswordInput';
+import { jwtDecode } from 'jwt-decode';
 
 const LoginForm = () => {
     const [username, setUsername] = useState('');
@@ -25,8 +26,12 @@ const LoginForm = () => {
 
         const data = await response.json();
 
+        const decoded = jwtDecode(data.access);
+        const userId = decoded.user_id;
+
         localStorage.setItem('access', data.access);
         localStorage.setItem('refresh', data.refresh);
+        localStorage.setItem('userId', userId);
 
         console.log(data);
 
