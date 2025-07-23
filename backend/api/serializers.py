@@ -7,6 +7,12 @@ class SkillSerializer(serializers.ModelSerializer):
     class Meta:
         model = Skill
         fields = '__all__'
+        read_only_fields = ['user']
+
+    def create(self, validated_data):
+        request = self.context.get('request')
+        validated_data['user'] = request.user
+        return super().create(validated_data)
 
     def validate_title(self, value):
         if any(char.isdigit() for char in value):
@@ -40,6 +46,12 @@ class SkillSerializer(serializers.ModelSerializer):
         return data
 
 class CustomUserSerializer(serializers.ModelSerializer):
+    skills = SkillSerializer(many=True)
+    age = serializers.SerializerMethodField()
+
+    def get_age(self, obj):
+        return obj.age
+
     class Meta:
         model = CustomUser
         fields = '__all__'
@@ -68,10 +80,12 @@ class CustomUserSerializer(serializers.ModelSerializer):
     def validate_residing_city(self, value):
         if any(not char.isalpha() for char in value):
             raise serializers.ValidationError("Residing city must only contain letter!")
+        return value
         
     def validate_residing_county(self, value):
         if any(not char.isalpha() for char in value):
             raise serializers.ValidationError("Residing county must only contain letter!")
+        return value
 
     def validate(self, data):
         return data
