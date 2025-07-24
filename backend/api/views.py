@@ -1,6 +1,6 @@
 from django.shortcuts import render
 
-from .serializers import SkillSerializer, CustomUserSerializer, ConversationSerializer, MessageSerializer, RegisterSerializer
+from .serializers import SkillSerializer, CustomUserSerializer, ConversationSerializer, MessageSerializer, RegisterSerializer, SkillPublicSerializer
 from .models import Skill, CustomUser, Conversation, Message
 from rest_framework import viewsets, status
 from rest_framework.response import Response
@@ -11,6 +11,12 @@ from rest_framework.views import APIView
 class SkillViewSet(viewsets.ModelViewSet):
     queryset = Skill.objects.all()
     serializer_class = SkillSerializer
+    def get_serializer_context(self):
+        return {'request': self.request}
+    
+class SkillPublicViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Skill.objects.all()
+    serializer_class = SkillPublicSerializer
 
     def get_serializer_context(self):
         return {'request': self.request}

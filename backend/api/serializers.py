@@ -44,6 +44,23 @@ class SkillSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError('Serious skills should require more than 100 hours of practice')
 
         return data
+    
+class SkillPublicSerializer(serializers.ModelSerializer):
+    user = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Skill
+        fields = ['id', 'title', 'difficulty', 'user']
+    
+    def get_user(self, obj):
+        user = obj.user
+        return {
+            'id': user.id,
+            'name': f"{user.last_name} {user.first_name}",
+            'profile': user.profile_picture.url if user.profile_picture else None
+        }
+    
+    
 
 class CustomUserSerializer(serializers.ModelSerializer):
     skills = SkillSerializer(many=True)
