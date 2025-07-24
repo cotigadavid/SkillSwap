@@ -1,7 +1,7 @@
 from django.shortcuts import render
 
-from .serializers import SkillSerializer, CustomUserSerializer, ConversationSerializer, MessageSerializer, RegisterSerializer
-from .models import Skill, CustomUser, Conversation, Message
+from .serializers import SkillSerializer, CustomUserSerializer, ConversationSerializer, MessageSerializer, RegisterSerializer, ReviewSerializer
+from .models import Skill, CustomUser, Conversation, Message, Review
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -24,7 +24,7 @@ class ConversationViewSet(viewsets.ModelViewSet):
     serializer_class = ConversationSerializer
 
 class MessageViewSet(viewsets.ModelViewSet):
-    queryset = Message.objects
+    queryset = Message.objects.all()
     serializer_class = MessageSerializer
 
 class RegisterView(APIView):
@@ -34,3 +34,7 @@ class RegisterView(APIView):
             serializer.save()
             return Response({"message": "User created successfully"}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class ReviewView(viewsets.ModelViewSet):
+    queryset = Review.objects.all()
+    serializer_class = ReviewSerializer
