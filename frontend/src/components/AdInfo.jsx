@@ -2,8 +2,9 @@ import React from "react";
 import star from '../assets/star.png';
 import { useParams } from "react-router-dom";
 import { useState, useEffect } from 'react';
+import '../styling/AdInfo.css';
 
-function AdInfo({rating, numberReview, description, location}) {
+function AdInfo() {
 
     const {id} = useParams();
     const [ad, setAd] = useState(null);
@@ -21,18 +22,18 @@ function AdInfo({rating, numberReview, description, location}) {
     if(!ad) return <h2>Loading...</h2>
 
     return (
-        <div>
-            <img src={ad.user.photo} alt="ad"/>
-            <img src={ad.user.photo} alt="photo"/>
-            <p>{ad.user.name}</p>
-            <p>{ad.title}</p>
-            <div>
-                <img src={star} alt="Star"/>
-                <span>{rating}</span>
-                <span>({numberReview})</span>
+        <div className="ad-info">
+            <img className="profile-picture" src={ad.user.profile} alt="ad"/>
+            <img className="skill-picture" src={ad.skill_picture} alt="photo"/>
+            <p className="user-name">{ad.user.name}</p>
+            <p className="skill-name">{ad.title}</p>
+            <div className="rating">
+                <img className="star" src={star} alt="Star"/>
+                <span>{ad.reviews.rating}</span>
+                <span className="number-reviews">({ad.reviews.count})</span>
             </div>
-            <p>{description}</p>
-            <p>{location}</p>
+            <p className="description">{ad.description}</p>
+            <p className="location">{ad.user.location}</p>
         </div>
     )
 }

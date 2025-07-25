@@ -19,20 +19,20 @@ function SkillList() {
 
       fetchSkills();
     }, []);
-  
+    
     return (
         <div>
             <h2>Lista anunturi:</h2>
                 {skills.map(item => (
                     <Link key={item.id} to={`/skills/${item.id}`}>
                         <SkillAdvertisement
-                            adImage={item.user.profile}
+                            adImage={item.skill_picture}
                             photo={item.user.profile}
                             name={item.user.name}
                             category={item.title}
-                            description={null}
-                            rating={null}
-                            numberReview={null}
+                            description={item.description}
+                            rating={item.reviews.rating}
+                            numberReview={item.reviews.count}
                         />
                     </Link>
                 ))}
