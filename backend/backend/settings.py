@@ -29,6 +29,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+MEDIA_URL = '/media/'        # URL prefix to access media files
+MEDIA_ROOT = BASE_DIR / 'media'  # The folder where files will be stored
 
 # Application definition
 
@@ -62,6 +64,9 @@ REST_FRAMEWORK = {
     ),
 }
 
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+]
 
 AUTH_USER_MODEL = "api.CustomUser"
 

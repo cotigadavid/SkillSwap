@@ -1,16 +1,9 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.models import BaseUserManager
+from datetime import date
 
 # Create your models here.
-
-class Skill(models.Model):
-    title = models.CharField(max_length=20)
-    difficulty = models.CharField(max_length=20, choices=[('easy', 'Easy'), ('medium', 'Medium'), ('hard', 'Hard'), ('serious', 'Serious')])
-    hours_needed = models.IntegerField(blank=True, null=True)
-
-    def __str__(self):
-        return self.title
     
 class CustomUserManager(BaseUserManager):
     def create_user(self, username, email, password=None):
@@ -22,23 +15,40 @@ class CustomUserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-
 class CustomUser(AbstractUser):
+    profile_picture = models.ImageField(upload_to='profile_pictures/', blank=True, null=True)
     phone_number = models.CharField(max_length=10)
     birth_date = models.DateField(blank=True, null=True)
     residing_city = models.CharField(max_length=50, blank=True, null=True)
     residing_county = models.CharField(max_length=50, blank=True, null=True)
-    skills = models.ManyToManyField(Skill, related_name='users', null=True, blank=True)
+
+    @property
+    def age(self):
+        if self.birth_date is None:
+            return None
+        today = date.today()
+        age = today.year - self.birth_date.year - ((today.month, today.day) < (self.birth_date.month, self.birth_date.day))
+        return age
 
     objects = CustomUserManager()  
 
     def __str__(self):
         return self.username
 
+class Skill(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="skills", null=True, blank=True)
+    skill_picture = models.ImageField(upload_to='skill_pictures/', blank=True, null=True)
+    title = models.CharField(max_length=20)
+    description = models.TextField(null=True, blank=True)
+    difficulty = models.CharField(max_length=20, choices=[('easy', 'easy'), ('medium', 'medium'), ('hard', 'hard'), ('serious', 'serious')])
+    hours_needed = models.IntegerField(blank=True, null=True)
+
+    def __str__(self):
+        return self.title
 
 class Conversation(models.Model):
     participants = models.ManyToManyField(CustomUser, related_name='conversations')
-    timestamp = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"Conversation {self.id}"
@@ -55,7 +65,15 @@ class Message(models.Model):
     text = models.CharField(max_length=1000)
     is_read = models.BooleanField(default=False)
     is_received = models.BooleanField(default=False)
-    timestamp = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"Message from {self.sender} at {self.timestamp}"
+    
+
+class Review(models.Model):
+    stars = models.IntegerField(choices=[(1, '1'), (2, '2'), (3, '3'), (4, '4'), (5, '5')])
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="reviews")
+    skill = models.ForeignKey(Skill, on_delete=models.CASCADE, related_name='reviews')
+    comment = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)

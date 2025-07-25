@@ -1,12 +1,13 @@
 import './App.css';
 import AuthWindow from './components/AuthWindow';
-import LoginForm from './components/LoginForm';
-import SignupForm from './components/SignupForm';
+import UserProfile from './components/UserProfile';
+import AddSkill from './components/AddSkill';
+import SkillEdit from './components/SkillEdit';
 
 function App() {
   return (
     <div className='main'>
-      <AuthWindow/>
+      <UserProfile/>
     </div>
   );
 }
