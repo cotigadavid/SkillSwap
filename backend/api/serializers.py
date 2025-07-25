@@ -1,7 +1,8 @@
 from rest_framework import serializers
-from .models import Skill, CustomUser, Conversation, Message, Review
+from .models import Skill, CustomUser, Conversation, Message, Review, SkillSwapRequest
 from datetime import date
 from .models import CustomUser
+from django.db.models import Avg
 
 class SkillSerializer(serializers.ModelSerializer):
     class Meta:
@@ -44,6 +45,7 @@ class SkillSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError('Serious skills should require more than 100 hours of practice')
 
         return data
+    
 
 class CustomUserSerializer(serializers.ModelSerializer):
     skills = SkillSerializer(many=True)
@@ -89,6 +91,23 @@ class CustomUserSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         return data
+    
+class SkillSwapRequestSerializer(serializers.ModelSerializer):
+    timestamp = serializers.ReadOnlyField()
+    offered_skill = serializers.PrimaryKeyRelatedField(many=True, queryset=Skill.objects.all())
+    requested_skill = serializers.PrimaryKeyRelatedField(many=True, queryset=Skill.objects.all())
+
+    class Meta:
+        model = SkillSwapRequest
+        fields = ['sender', 'receiver', 'offered_skills', 'requested_skills', 'status', 'message', 'timestamp']
+    
+    def create(self, validated_data):
+        offered_skills = validated_data.pop('offered_skill')
+        requested_skills = validated_data.pop('requested_skill')
+        skill_swap_request = SkillSwapRequest.objects.create(**validated_data)
+        skill_swap_request.offered_skill.set(offered_skills)
+        skill_swap_request.requested_skill.set(requested_skills)
+        return skill_swap_request
     
 
 class ConversationSerializer(serializers.ModelSerializer):
@@ -158,5 +177,34 @@ class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
         fields = '__all__'
+
+class SkillPublicSerializer(serializers.ModelSerializer):
+    user = serializers.SerializerMethodField()
+    reviews = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Skill
+        fields = ['id', 'title', 'difficulty', 'user', 'description', 'skill_picture', 'reviews']
+    
+    def get_user(self, obj):
+        user = obj.user
+        return {
+            'id': user.id,
+            'name': f"{user.last_name} {user.first_name}",
+            'profile': 'http://localhost:8000' + user.profile_picture.url if user.profile_picture else None,
+            'location': f"{user.residing_city}, {user.residing_county}",
+        }
+    
+    def get_reviews(self, obj):
+        reviews = obj.reviews.all()
+        count = reviews.count()
+        average = reviews.aggregate(rating=Avg('stars'))['rating']
+
+        return {'count': count, 'rating': average}
+            
+    
+    
+    
+    
 
     

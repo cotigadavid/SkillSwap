@@ -1,67 +1,42 @@
-import React from "react"
-import SkillAdvertisement from "./SkillAdvertisement"
-import profilePic from '../assets/profile.jpg'
-import '../styling/SkillList.css'
+import React, { useState, useEffect } from "react";
+import SkillAdvertisement from "./SkillAdvertisement";
+import { Link } from 'react-router-dom';
+import profilePic from '../assets/profile.jpg';
+import '../styling/SkillList.css';
 
-const skills = [
-  {
-    id: 1,
-    adImage: profilePic,
-    photo: profilePic,
-    name: "Mihai Gheorghe",
-    category: "Chitara",
-    description: "Te invat sa canti la chitara de la 0! Am 24 de ani de experienta in chitara si am cantat in diverse trupe.",
-    rating: 3.7,
-    numberReview: 11,
-  },
-  {
-    id: 2,
-    adImage: profilePic,
-    photo: profilePic,
-    name: "Ana Popescu",
-    category: "Pian",
-    description: "Lectii de pian pentru incepatori si avansati. Experienta de 15 ani in predare.",
-    rating: 4.5,
-    numberReview: 23,
-  },
-  {
-    id: 3,
-    adImage: profilePic,
-    photo: profilePic,
-    name: "Ion Ionescu",
-    category: "Vioara",
-    description: "Te invat sa canti la vioara cu tehnici avansate. Experienta de 10 ani in orchestra.",
-    rating: 4.8,
-    numberReview: 18,
-  },
-  {
-    id: 4,
-    adImage: profilePic,
-    photo: profilePic,
-    name: "Maria Georgescu",
-    category: "Canto",
-    description: "Lectii de canto pentru toate varstele. Experienta de 20 de ani in muzica.",
-    rating: 4.2,
-    numberReview: 30,
-  }
-];
+
 
 function SkillList() {
+
+    const [skills, setSkills] = useState([]);
+
+    useEffect(() => {
+      const fetchSkills = async () => {
+        const response = await fetch('http://localhost:8000/api/skills-public/');
+        const data = await response.json();
+        setSkills(data);
+      };
+
+      fetchSkills();
+    }, []);
+    
     return (
         <div>
             <h2>Lista anunturi:</h2>
-            {skills.map(item => (
-                <SkillAdvertisement
-                    key={item.id}
-                    adImage={item.adImage}
-                    photo={item.photo}
-                    name={item.name}
-                    category={item.category}
-                    description={item.description}
-                    rating={item.rating}
-                    numberReview={item.numberReview}
-                />
-            ))}
+                {skills.map(item => (
+                    <Link key={item.id} to={`/skills/${item.id}`}>
+                        <SkillAdvertisement
+                            adImage={item.skill_picture}
+                            photo={item.user.profile}
+                            name={item.user.name}
+                            category={item.title}
+                            description={item.description}
+                            rating={item.reviews.rating}
+                            numberReview={item.reviews.count}
+                        />
+                    </Link>
+                ))}
+            
         </div>
     )
 }
