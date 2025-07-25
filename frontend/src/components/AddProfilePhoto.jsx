@@ -36,6 +36,7 @@ const AddProfilePicture = ( {closeFunction} ) => {
         <div>
             <input type="file" onChange={handleFileChange} accept="image/*" />
             <button onClick={handleSubmit}>Upload</button>
+            <button onClick={closeFunction}>Cancel</button>
         </div>
     );
 };

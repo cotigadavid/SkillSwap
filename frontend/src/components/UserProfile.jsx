@@ -24,7 +24,7 @@ const UserProfile = () => {
         };
 
         fetchUser();
-    }, [showAddPhoto]);
+    }, [showAddPhoto, infoState]);
 
     const toggleInfoState = () => {
         if (infoState === 'info')

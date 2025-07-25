@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import secureAxios from '../secureAxios';
 
 const AddSkill = () => {
     const [title, setTitle] = useState('');
@@ -8,26 +9,17 @@ const AddSkill = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        const response = await fetch('http://localhost:8000/api/skills/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                title: title,
-                difficulty: difficulty,
-                hours_needed: hours,
-            }),
+        const accessToken = localStorage.getItem('access'); 
+
+        const response = await secureAxios.post('skills/', {
+            
+            title: title,
+            difficulty: difficulty,
+            hours_needed: hours,
+            
         });
 
-        const data = await response.json();
-
-        if (response.ok) {
-                alert("Skill added successfully!");
-        } else {
-                console.error(data);
-                alert("Error adding skill");
-        }
+        const data = await response.data;
     };
 
     return (
