@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
-import SkillAdvertisement from "./SkillAdvertisement"
-import profilePic from '../assets/profile.jpg'
-import '../styling/SkillList.css'
+import SkillAdvertisement from "./SkillAdvertisement";
+import { Link } from 'react-router-dom';
+import profilePic from '../assets/profile.jpg';
+import '../styling/SkillList.css';
 
 
 
@@ -18,22 +19,24 @@ function SkillList() {
 
       fetchSkills();
     }, []);
-  
+    
     return (
         <div>
             <h2>Lista anunturi:</h2>
-            {skills.map(item => (
-                <SkillAdvertisement
-                    key={item.id}
-                    adImage={item.user.profile}
-                    photo={item.user.profile}
-                    name={item.user.name}
-                    category={item.title}
-                    description={null}
-                    rating={null}
-                    numberReview={null}
-                />
-            ))}
+                {skills.map(item => (
+                    <Link key={item.id} to={`/skills/${item.id}`}>
+                        <SkillAdvertisement
+                            adImage={item.skill_picture}
+                            photo={item.user.profile}
+                            name={item.user.name}
+                            category={item.title}
+                            description={item.description}
+                            rating={item.reviews.rating}
+                            numberReview={item.reviews.count}
+                        />
+                    </Link>
+                ))}
+            
         </div>
     )
 }
