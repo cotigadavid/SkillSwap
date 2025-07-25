@@ -1,15 +1,18 @@
 import './App.css';
-import AuthWindow from './components/AuthWindow';
-import LoginForm from './components/LoginForm';
-import SignupForm from './components/SignupForm';
-import SkillAdvertisement from './components/SkillAdvertisement'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import SkillList from './components/SkillList';
 import UserProfile from './components/UserProfile';
+import AdInfo from './components/AdInfo';
+
 
 function App() {
   return (
     <div className='main'>
-      <UserProfile/>
+      <Routes>
+        <Route path="/" element={<UserProfile />} />
+        <Route path="/skills" element={<SkillList />} />
+        <Route path="/skills/:id" element={<AdInfo />} />
+      </Routes>
     </div>
   );
 }

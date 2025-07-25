@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Skill, CustomUser, Conversation, Message
+from .models import Skill, CustomUser, Conversation, Message, SkillSwapRequest
 from datetime import date
 from .models import CustomUser
 
@@ -106,6 +106,23 @@ class CustomUserSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         return data
+    
+class SkillSwapRequestSerializer(serializers.ModelSerializer):
+    timestamp = serializers.ReadOnlyField()
+    offered_skill = serializers.PrimaryKeyRelatedField(many=True, queryset=Skill.objects.all())
+    requested_skill = serializers.PrimaryKeyRelatedField(many=True, queryset=Skill.objects.all())
+
+    class Meta:
+        model = SkillSwapRequest
+        fields = ['sender', 'receiver', 'offered_skills', 'requested_skills', 'status', 'message', 'timestamp']
+    
+    def create(self, validated_data):
+        offered_skills = validated_data.pop('offered_skill')
+        requested_skills = validated_data.pop('requested_skill')
+        skill_swap_request = SkillSwapRequest.objects.create(**validated_data)
+        skill_swap_request.offered_skill.set(offered_skills)
+        skill_swap_request.requested_skill.set(requested_skills)
+        return skill_swap_request
     
 
 class ConversationSerializer(serializers.ModelSerializer):

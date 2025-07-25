@@ -4,7 +4,8 @@ from django.contrib.auth.models import BaseUserManager
 from datetime import date
 
 # Create your models here.
-    
+
+
 class CustomUserManager(BaseUserManager):
     def create_user(self, username, email, password=None):
         if not email:
@@ -51,6 +52,20 @@ class Conversation(models.Model):
     def __str__(self):
         return f"Conversation {self.id}"
 
+class SkillSwapRequest(models.Model):
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('accepted', 'Accepted'),
+        ('declined', 'Declined'),
+    ]
+
+    sender = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='request_sender')
+    receiver = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='request_receiver')
+    offered_skill = models.ManyToManyField(Skill, related_name='offered_skill')
+    requested_skill = models.ManyToManyField(Skill, related_name='requested_skill')
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
+    message = models.TextField(blank=True)
+    timestamp = models.DateTimeField(auto_now_add=True)
 
 class Message(models.Model):
     conversation = models.ForeignKey(
