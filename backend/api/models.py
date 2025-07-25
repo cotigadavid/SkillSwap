@@ -37,8 +37,10 @@ class CustomUser(AbstractUser):
 
 class Skill(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="skills", null=True, blank=True)
+    skill_picture = models.ImageField(upload_to='skill_pictures/', blank=True, null=True)
     title = models.CharField(max_length=20)
-    difficulty = models.CharField(max_length=20, choices=[('easy', 'Easy'), ('medium', 'Medium'), ('hard', 'Hard'), ('serious', 'Serious')])
+    description = models.TextField(null=True, blank=True)
+    difficulty = models.CharField(max_length=20, choices=[('easy', 'easy'), ('medium', 'medium'), ('hard', 'hard'), ('serious', 'serious')])
     hours_needed = models.IntegerField(blank=True, null=True)
 
     def __str__(self):
@@ -46,7 +48,7 @@ class Skill(models.Model):
 
 class Conversation(models.Model):
     participants = models.ManyToManyField(CustomUser, related_name='conversations')
-    timestamp = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"Conversation {self.id}"
@@ -63,7 +65,15 @@ class Message(models.Model):
     text = models.CharField(max_length=1000)
     is_read = models.BooleanField(default=False)
     is_received = models.BooleanField(default=False)
-    timestamp = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"Message from {self.sender} at {self.timestamp}"
+    
+
+class Review(models.Model):
+    stars = models.IntegerField(choices=[(1, '1'), (2, '2'), (3, '3'), (4, '4'), (5, '5')])
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="reviews")
+    skill = models.ForeignKey(Skill, on_delete=models.CASCADE, related_name='reviews')
+    comment = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)

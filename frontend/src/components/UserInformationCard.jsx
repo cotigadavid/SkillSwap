@@ -15,7 +15,7 @@ const UserInformationCard = ({ user }) => {
                 <h3>Skills</h3>
                 <ul> {user.skills && user.skills.map(skill => (
                     <div>
-                    <li key={skill.id}> <img src={came} width="50" height="50" alt="skill"/> {skill.title} {skill.difficulty}</li>
+                    <li key={skill.id}> <img src={skill.skill_picture} width="50" height="50" alt="skill"/> {skill.title} {skill.difficulty}</li>
                     </div>
                     ))}
                 </ul>

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Skill, CustomUser, Conversation, Message
+from .models import Skill, CustomUser, Conversation, Message, Review
 from datetime import date
 from .models import CustomUser
 
@@ -109,7 +109,7 @@ class CustomUserSerializer(serializers.ModelSerializer):
     
 
 class ConversationSerializer(serializers.ModelSerializer):
-    timestamp = serializers.ReadOnlyField()
+    created_at = serializers.ReadOnlyField()
 
     class Meta:
         model = Conversation
@@ -127,7 +127,7 @@ class ConversationSerializer(serializers.ModelSerializer):
 
 
 class MessageSerializer(serializers.ModelSerializer):
-    timestamp = serializers.ReadOnlyField()
+    created_at = serializers.ReadOnlyField()
 
     class Meta:
         model = Message
@@ -168,3 +168,12 @@ class RegisterSerializer(serializers.ModelSerializer):
                     password=validated_data['password']
                 )
                 return user
+        
+class ReviewSerializer(serializers.ModelSerializer):
+    created_at = serializers.ReadOnlyField()
+
+    class Meta:
+        model = Review
+        fields = '__all__'
+
+    
