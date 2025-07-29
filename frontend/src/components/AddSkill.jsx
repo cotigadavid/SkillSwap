@@ -9,8 +9,6 @@ const AddSkill = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        const accessToken = localStorage.getItem('access'); 
-
         const response = await secureAxios.post('skills/', {
             
             title: title,
@@ -18,8 +16,6 @@ const AddSkill = () => {
             hours_needed: hours,
             
         });
-
-        const data = await response.data;
     };
 
     return (

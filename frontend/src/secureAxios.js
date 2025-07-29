@@ -27,14 +27,19 @@ secureAxios.interceptors.response.use(
             originalRequest._retry = true;
 
             const refresh = localStorage.getItem('refresh');
-            const res = await axios.post('http://localhost:8000/api/token/refresh/', {
-                refresh,
-            });
-
-            const newAccess = res.data.access;
-            localStorage.setItem('access', newAccess);
-            originalRequest.headers.Authorization = `Bearer ${newAccess}`;
-            return secureAxios(originalRequest); 
+            try {
+                const res = await axios.post('http://localhost:8000/api/token/refresh/', {
+                    refresh,
+                });
+                
+                const newAccess = res.data.access;
+                localStorage.setItem('access', newAccess);
+                originalRequest.headers.Authorization = `Bearer ${newAccess}`;
+                return secureAxios(originalRequest); 
+            } catch (e) {
+                console.log('Refresh token request failed:', e);
+                return Promise.reject(e);
+            }
         }
         return Promise.reject(error);
     }
