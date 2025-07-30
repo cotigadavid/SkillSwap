@@ -9,7 +9,9 @@ function AdMain() {
     const { id } = useParams();
     const [mySkills, setMySkills] = useState([]);
     const [ad, setAd] = useState(null);
-
+    const [errorMessage, setErrorMessage] = useState(null);
+    const [successMessage, setSuccessMessage] = useState(null);
+    
     useEffect(() => {
         const fetchData = async() => {
             const response = await fetch(`http://localhost:8000/api/skills-public/${id}`);
@@ -29,16 +31,28 @@ function AdMain() {
         fetchSkills();
     }, []);
 
-    const handleSubmit = async (skillIds) => {
+    const handleSubmit = async (skillIds, message) => {
+        
+        setErrorMessage(null);
+        setSuccessMessage(null);
+
         try {
             const response = await secureAxios.post("/requests/", {
-            receiver: ad.user.id,
-            offered_skill: skillIds,
-            requested_skill: [ad.id],
-            message: "Salut! Hai sa facem schimb de skill-uri!"
-        });
+                receiver: ad.user.id,
+                offered_skill: skillIds,
+                requested_skill: [ad.id],
+                message: message,
+            });
+            setSuccessMessage("The request was sent successfully!")
+
         } catch(error) {
-            console.error("SERVER ERROR:", error.response?.data);
+            if (error.response && error.response.data) {
+                const errorMessage = error.response.data.detail || error.response.data.message || JSON.stringify(error.response.data);
+                setErrorMessage(errorMessage);
+            }
+            else {
+                setErrorMessage("Unknown error from the server. We're sorry!");
+            }
         }
         
     };
@@ -47,6 +61,12 @@ function AdMain() {
         <div>
             <h1>Send request for skill swap</h1>
             <SkillRequestForm mySkills={mySkills} onSubmit={handleSubmit}/>
+            {errorMessage && (
+                <div>{errorMessage}</div>
+            )}
+            {successMessage && (
+                <div>{successMessage}</div>
+            )}
             <AdInfo ad={ad}/>
         </div>
     )

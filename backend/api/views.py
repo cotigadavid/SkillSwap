@@ -2,10 +2,11 @@ from django.shortcuts import render
 
 from .serializers import SkillSerializer, CustomUserSerializer, ConversationSerializer, MessageSerializer, RegisterSerializer, ReviewSerializer, SkillPublicSerializer, SkillSwapRequestSerializer
 from .models import Skill, CustomUser, Conversation, Message, Review, SkillSwapRequest
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status, serializers
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.exceptions import ValidationError
 
 
 # Create your views here.
@@ -30,10 +31,24 @@ class SkillPublicViewSet(viewsets.ReadOnlyModelViewSet):
 class SkillSwapRequestViewSet(viewsets.ModelViewSet):
     queryset = SkillSwapRequest.objects.all()
     serializer_class = SkillSwapRequestSerializer
+    permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
+        
+        receiver = serializer.validated_data.get('receiver')
+        offered_skills = serializer.validated_data.get('offered_skill')
+        requested_skills = serializer.validated_data.get('requested_skill')
+
+        existing_requests = SkillSwapRequest.objects.filter(sender=self.request.user, receiver=receiver, status='pending')
+
+        for ask in existing_requests:
+            if ( set(ask.offered_skill.all()) == set(offered_skills)
+                and set(ask.requested_skill.all()) == set(requested_skills)
+            ):
+                raise ValidationError("You already sent an exact same request!")
+            
         serializer.save(sender=self.request.user)
-    
+     
 class SkillPublicViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Skill.objects.all()
     serializer_class = SkillPublicSerializer

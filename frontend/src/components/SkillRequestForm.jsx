@@ -4,11 +4,12 @@ import React, {useState} from "react";
 
 function SkillRequestForm({mySkills = [], onSubmit}) {
     const [selectedSkillIds, setSelectedSkillIds] = useState([]);
+    const [message, setMessage] = useState("Hi there! Let's exchange skills!");
 
     const handleSubmit = (event) => {
         event.preventDefault();
         if (selectedSkillIds.length > 0 && onSubmit) {
-            onSubmit(selectedSkillIds);
+            onSubmit(selectedSkillIds, message);
         }
     };
 
@@ -29,6 +30,9 @@ function SkillRequestForm({mySkills = [], onSubmit}) {
                         </option>
                     ))}  
                 </select>
+
+                <label htmlFor="message">Message(optional):</label>
+                <textarea id="message" value={message} onChange={(e) => setMessage(e.target.value)} placeholder="Write your message here..."/>
 
                 <button type="submit">Submit</button>
         </form>
