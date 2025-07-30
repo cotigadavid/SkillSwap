@@ -72,3 +72,12 @@ input:focus {
 .submitButton:hover {
     background-color: #fff000;
 }
+
+
+.my-message {
+    border: 1px solid red;
+}
+
+.other-message {
+    border: 1px solid green;
+}

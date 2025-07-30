@@ -6,14 +6,19 @@ import AdInfo from './components/AdInfo';
 import AddSkill from './components/AddSkill';
 import SkillEdit from './components/SkillEdit';
 import AuthWindow from './components/AuthWindow';
+import ChatWindow from './components/ChatWindow';
+import Conversations from './components/Conversations';
+import AddProfilePicture from './components/AddProfilePhoto';
+import UserEditCard from './components/UserEditCard';
 
 function App() {
   return (
     <div className='main'>
       <Routes>
-        <Route path="/" element={<UserProfile />} />
-        <Route path="/skills" element={<SkillList />} />
-        <Route path="/skills/:id" element={<AdInfo />} />
+        <Route path="/auth" element={<AuthWindow/>}/>
+        <Route path="/" element={<Conversations />} />
+        <Route path="/conv/:convId" element={<ChatWindow />} />
+        <Route path="/add" element={<UserEditCard/>}/>
       </Routes>
     </div>
   );

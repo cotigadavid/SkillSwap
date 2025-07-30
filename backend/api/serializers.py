@@ -145,7 +145,6 @@ class MessageSerializer(serializers.ModelSerializer):
         return message
 
 
-
 class RegisterSerializer(serializers.ModelSerializer):
         
         class Meta:

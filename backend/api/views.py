@@ -5,6 +5,8 @@ from .models import Skill, CustomUser, Conversation, Message, Review, SkillSwapR
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 
 # Create your views here.
 
@@ -52,3 +54,33 @@ class RegisterView(APIView):
 class ReviewView(viewsets.ModelViewSet):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def MarkConversationAsRead(request):
+    print(request)
+    conversation_id = request.data.get('conversation_id')
+    if not conversation_id: 
+        return Response({'error': 'Missing conversation_id'}, status=400)
+    
+    updated = Message.objects.filter(
+        conversation_id=conversation_id,
+        is_read=False,
+    ).update(is_read=True)
+
+    return Response({'updated': updated})
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def MarkConversationAsReceived(request):
+    conversation_id = request.data.get('conversation_id')
+    if not conversation_id:
+        return Response({'error': 'Missing conversation_id'}, status=400)
+    
+    updated = Message.objects.filter(
+        conversation_id=conversation_id,
+        is_received=False,
+    ).update(is_received=True)
+
+    return Response({'updated': updated})
