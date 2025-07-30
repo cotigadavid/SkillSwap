@@ -5,12 +5,18 @@ from .models import Skill, CustomUser, Conversation, Message, Review, SkillSwapR
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
+
 
 # Create your views here.
 
 class SkillViewSet(viewsets.ModelViewSet):
-    queryset = Skill.objects.all()
+    permission_classes = [IsAuthenticated]
     serializer_class = SkillSerializer
+
+    def get_queryset(self):
+        return Skill.objects.filter(user=self.request.user)
+
     def get_serializer_context(self):
         return {'request': self.request}
     
@@ -24,6 +30,9 @@ class SkillPublicViewSet(viewsets.ReadOnlyModelViewSet):
 class SkillSwapRequestViewSet(viewsets.ModelViewSet):
     queryset = SkillSwapRequest.objects.all()
     serializer_class = SkillSwapRequestSerializer
+
+    def perform_create(self, serializer):
+        serializer.save(sender=self.request.user)
     
 class SkillPublicViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Skill.objects.all()

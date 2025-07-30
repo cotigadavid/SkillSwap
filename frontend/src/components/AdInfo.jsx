@@ -4,21 +4,8 @@ import { useParams } from "react-router-dom";
 import { useState, useEffect } from 'react';
 import '../styling/AdInfo.css';
 
-function AdInfo() {
-
-    const {id} = useParams();
-    const [ad, setAd] = useState(null);
-
-    useEffect(() => {
-        const fetchData = async() => {
-            const response = await fetch(`http://localhost:8000/api/skills-public/${id}`);
-            const ad = await response.json();
-            setAd(ad);
-        }
-
-        fetchData();
-    }, [id]);
-
+function AdInfo( {ad} ) {
+    
     if(!ad) return <h2>Loading...</h2>
 
     return (

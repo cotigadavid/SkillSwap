@@ -93,13 +93,14 @@ class CustomUserSerializer(serializers.ModelSerializer):
         return data
     
 class SkillSwapRequestSerializer(serializers.ModelSerializer):
+    sender = serializers.PrimaryKeyRelatedField(read_only=True)
     timestamp = serializers.ReadOnlyField()
     offered_skill = serializers.PrimaryKeyRelatedField(many=True, queryset=Skill.objects.all())
     requested_skill = serializers.PrimaryKeyRelatedField(many=True, queryset=Skill.objects.all())
 
     class Meta:
         model = SkillSwapRequest
-        fields = ['sender', 'receiver', 'offered_skills', 'requested_skills', 'status', 'message', 'timestamp']
+        fields = ['sender', 'receiver', 'offered_skill', 'requested_skill', 'status', 'message', 'timestamp']
     
     def create(self, validated_data):
         offered_skills = validated_data.pop('offered_skill')
