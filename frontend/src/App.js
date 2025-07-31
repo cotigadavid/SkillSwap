@@ -10,6 +10,7 @@ import ChatWindow from './components/ChatWindow';
 import Conversations from './components/Conversations';
 import AddProfilePicture from './components/AddProfilePhoto';
 import UserEditCard from './components/UserEditCard';
+import OtherProfile from './components/OtherProfile';
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
         <Route path="/" element={<Conversations />} />
         <Route path="/conv/:convId" element={<ChatWindow />} />
         <Route path="/add" element={<UserEditCard/>}/>
+        <Route path="/profile/:userId" element={<OtherProfile/>}/>
       </Routes>
     </div>
   );
