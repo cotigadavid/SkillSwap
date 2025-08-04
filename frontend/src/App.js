@@ -7,6 +7,7 @@ import AdMain from './components/AdMain';
 import AddSkill from './components/AddSkill';
 import SkillEdit from './components/SkillEdit';
 import AuthWindow from './components/AuthWindow';
+import RequestList from './components/RequestList';
 
 
 function App() {
@@ -16,6 +17,7 @@ function App() {
         <Route path="/" element={<UserProfile />} />
         <Route path="/skills" element={<SkillList />} />
         <Route path="/skills/:id" element={<AdMain />} />
+        <Route path="/requests" element={<RequestList/>} />
       </Routes>
     </div>
   );
