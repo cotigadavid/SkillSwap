@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import secureAxios from "../secureAxios";
+import { useNavigate } from "react-router-dom";
 
 const ChatWindow = () => {
     const [message, setMessage] = useState('');
@@ -13,6 +14,8 @@ const ChatWindow = () => {
     const [showFileUpload, setShowFileUpload] = useState(false);
     
     const { convId } = useParams();
+
+    const navigate = useNavigate();
     
     const sendMessage = async () => {
 
@@ -145,8 +148,10 @@ const ChatWindow = () => {
     return (
         <div>
             <div className="Receiver">
-                <p>{receiver.username}</p>
-                <img src={`${receiver.profile_picture}`} width="100" height="100" alt="Profile"/>
+                <button onClick={() => navigate(`/profile/${receiver.id}`)}>
+                    <p>{receiver.username}</p>
+                    <img src={`${receiver.profile_picture}`} width="100" height="100" alt="Profile"/>
+                </button>
             </div>
 
             <div>

@@ -3,6 +3,7 @@ import star from '../assets/star.png';
 import { useParams } from "react-router-dom";
 import { useState, useEffect } from 'react';
 import '../styling/AdInfo.css';
+import secureAxios from "../secureAxios";
 
 function AdInfo() {
 
@@ -11,8 +12,8 @@ function AdInfo() {
 
     useEffect(() => {
         const fetchData = async() => {
-            const response = await fetch(`http://localhost:8000/api/skills-public/${id}`);
-            const ad = await response.json();
+            const response = await secureAxios.get(`/skills/${id}/`);
+            const ad = await response.data;
             setAd(ad);
         }
 
@@ -29,8 +30,8 @@ function AdInfo() {
             <p className="skill-name">{ad.title}</p>
             <div className="rating">
                 <img className="star" src={star} alt="Star"/>
-                <span>{ad.reviews.rating}</span>
-                <span className="number-reviews">({ad.reviews.count})</span>
+                {/* <span>{ad.reviews.rating}</span>
+                <span className="number-reviews">({ad.reviews.count})</span> */}
             </div>
             <p className="description">{ad.description}</p>
             <p className="location">{ad.user.location}</p>

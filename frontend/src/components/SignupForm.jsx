@@ -2,13 +2,15 @@ import '../styling/LoginForm.css';
 import { useState } from "react";
 import PasswordInput from './PasswordInput';
 import { jwtDecode } from 'jwt-decode';
-
+import { useNavigate } from "react-router-dom";
 
 const SignupForm = () => {
     const [email, setEmail] = useState('')
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
+
+    const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -38,6 +40,8 @@ const SignupForm = () => {
         localStorage.setItem('userId', userId);
 
         console.log(data);
+
+        navigate(-1);
     };
 
     const toggleShowPassword = () => {

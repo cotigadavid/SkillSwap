@@ -1,6 +1,6 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import SkillViewSet, CustomUserViewSet, ConversationViewSet, MessageViewSet, RegisterView, SkillPublicViewSet, SkillSwapRequestViewSet, MarkConversationAsRead, MarkConversationAsReceived
+from .views import SkillViewSet, CustomUserViewSet, ConversationViewSet, MessageViewSet, RegisterView, SkillPublicViewSet, SkillSwapRequestViewSet, MarkConversationAsRead, MarkConversationAsReceived, search_skills
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
@@ -22,4 +22,5 @@ urlpatterns = [
     path('register/', RegisterView.as_view(), name="register"),
     path('mark-read/', MarkConversationAsRead),
     path('mark-received/', MarkConversationAsReceived),
+    path('skills_search/', search_skills),
 ]

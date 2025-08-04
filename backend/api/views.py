@@ -7,6 +7,9 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
+from django.http import JsonResponse
+from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank, TrigramSimilarity
+from django.db.models.functions import Greatest
 
 # Create your views here.
 
@@ -84,3 +87,24 @@ def MarkConversationAsReceived(request):
     ).update(is_received=True)
 
     return Response({'updated': updated})
+
+@api_view(['GET'])
+def search_skills(request):
+    query = request.GET.get('query', '')
+
+    if (query):
+        vector = SearchVector('title')
+        search_query = SearchQuery(query)
+        skills = Skill.objects.annotate(
+            rank=SearchRank(vector, search_query),
+            similarity=TrigramSimilarity('title', query),
+            score=Greatest(SearchRank(vector, search_query), TrigramSimilarity('title', query) - 0.3)
+        ).filter(score__gt=0.0).order_by('-score')
+    else:
+        skills = Skill.objects.all()
+
+    if (skills.count() == 0):
+        skills = Skill.objects.all()
+
+    serializer = SkillPublicSerializer(skills, many=True, context={"request": request})
+    return Response(serializer.data)
