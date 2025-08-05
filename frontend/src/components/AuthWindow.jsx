@@ -1,71 +1,60 @@
-//import '../styling/AuthWindow.css';
+
 import { useState } from "react";
 import LoginForm from './LoginForm';
 import SignupForm from './SignupForm';
 import logo from '../assets/Logo1024.png';
-//import "../index.css"
+import { Eye, EyeOff, ArrowLeft, X } from "lucide-react";
+
 
 
 const AuthWindow = () => {
     const [selected, setSelected] = useState('LogIn');
 
-    // return (
-    //     <div className='AuthWindow'>
-    //         <figure><img src={logo} width="256" height="256" alt="Logo"></img></figure>
-    //         <button type="button" id='log' 
-    //             className={selected === 'LogIn' ? 'active' : ''} 
-    //             onClick={() => setSelected('LogIn')}>Log in</button>
-    //         <button type="button" id='sign'
-    //             className={selected === 'SignUp' ? 'active' : ''} 
-    //             onClick={() => setSelected("SignUp")}>Sign up</button>
+    const logo = "https://via.placeholder.com/80x80/10b981/ffffff?text=W";
 
-    //         <div className='FormContainer'>
-    //             {selected === 'LogIn' && <LoginForm/>}
-    //             {selected === 'SignUp' && <SignupForm/>}
-    //         </div>  
-    //     </div>
-    // );
-   return (
-    <div className="mt-24 bg-[#ffdbdb] py-8 text-center">
-        <figure className="flex justify-center mb-6">
-        <img src={logo} width="256" height="256" alt="Logo" />
-        </figure>
+     return (
+        <div className="min-h-screen bg-gray-600 flex items-center justify-center p-4 relative">
+            <div className="absolute inset-0 bg-black bg-opacity-40"></div>
+            
+            <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md mx-auto transform transition-all duration-300 animate-in fade-in-0 zoom-in-95">
+                <div className="flex items-center justify-center p-6 pb-4">
+                    <h1 className="text-xl font-semibold text-gray-900">Welcome to SkillSwap!</h1>
+                </div>
 
-        <div className="flex justify-center gap-4 mb-8">
-        <button
-            type="button"
-            id="log"
-            className={`w-2/5 max-w-[200px] h-12 text-lg rounded-md transition-colors duration-200 ${
-            selected === 'LogIn'
-                ? 'bg-[#007bff] text-white font-bold border-2 border-[#007bff]'
-                : 'bg-gray-300 hover:bg-[#e0e0e0]'
-            }`}
-            onClick={() => setSelected('LogIn')}
-        >
-            Log in
-        </button>
-
-        <button
-            type="button"
-            id="sign"
-            className={`w-2/5 max-w-[200px] h-12 text-lg rounded-md transition-colors duration-200 ${
-            selected === 'SignUp'
-                ? 'bg-[#007bff] text-white font-bold border-2 border-[#007bff]'
-                : 'bg-gray-300 hover:bg-[#e0e0e0]'
-            }`}
-            onClick={() => setSelected('SignUp')}
-        >
-            Sign up
-        </button>
+                <div className="px-6 pb-6">
+                    <div className="animate-in fade-in-0 slide-in-from-right-1 duration-300">
+                        {selected === 'LogIn' && <LoginForm />}
+                        {selected === 'SignUp' && <SignupForm />}
+                    </div>
+                    
+                    <div className="flex justify-center mt-6 space-x-8">
+                        <button
+                            type="button"
+                            onClick={() => setSelected('LogIn')}
+                            className={`text-sm font-medium transition-all duration-200 ${
+                                selected === 'LogIn'
+                                    ? 'text-gray-700 border-b-2 border-gray-700 pb-1'
+                                    : 'text-teal-500 hover:text-teal-600'
+                            }`}
+                        >
+                            Log in
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setSelected('SignUp')}
+                            className={`text-sm font-medium transition-all duration-200 ${
+                                selected === 'SignUp'
+                                    ? 'text-gray-700 border-b-2 border-gray-700 pb-1'
+                                    : 'text-teal-500 hover:text-teal-600'
+                            }`}
+                        >
+                            Sign up
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
-
-        <div className="w-full">
-        {selected === 'LogIn' && <LoginForm />}
-        {selected === 'SignUp' && <SignupForm />}
-        </div>
-    </div>
     );
-
 };
 
 export default AuthWindow;
