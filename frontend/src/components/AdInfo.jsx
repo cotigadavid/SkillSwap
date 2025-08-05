@@ -5,21 +5,8 @@ import { useState, useEffect } from 'react';
 //import '../styling/AdInfo.css';
 import secureAxios from "../secureAxios";
 
-function AdInfo() {
-
-    const {id} = useParams();
-    const [ad, setAd] = useState(null);
-
-    useEffect(() => {
-        const fetchData = async() => {
-            const response = await secureAxios.get(`/skills/${id}/`);
-            const ad = await response.data;
-            setAd(ad);
-        }
-
-        fetchData();
-    }, [id]);
-
+function AdInfo( {ad} ) {
+    
     if(!ad) return <h2>Loading...</h2>
 
     return (
