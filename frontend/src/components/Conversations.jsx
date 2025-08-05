@@ -26,14 +26,20 @@ const Conversations = () => {
     }, []);
 
     return (
-        <div>
-            { conversations.map(convo => (
-                <div key={convo.id}>
-                    <button onClick={() => navigate(`/conv/${convo.id}`)}>Next</button>
+        <div className="max-w-md mx-auto p-4 space-y-3 bg-white rounded shadow-md">
+            {conversations.map((convo) => (
+                <div key={convo.id} className="border rounded p-3 bg-gray-50">
+                    <button
+                        onClick={() => navigate(`/conv/${convo.id}`)}
+                        className="w-full text-left text-blue-600 hover:underline"
+                    >
+                        Go to Conversation #{convo.id}
+                    </button>
                 </div>
             ))}
         </div>
     );
+
 };
 
 export default Conversations;

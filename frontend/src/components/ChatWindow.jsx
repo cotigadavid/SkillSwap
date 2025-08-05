@@ -146,61 +146,119 @@ const ChatWindow = () => {
     };
     
     return (
-        <div>
-            <div className="Receiver">
-                <button onClick={() => navigate(`/profile/${receiver.id}`)}>
-                    <p>{receiver.username}</p>
-                    <img src={`${receiver.profile_picture}`} width="100" height="100" alt="Profile"/>
+        <div className="max-w-3xl mx-auto p-4 space-y-6 bg-white rounded shadow-md">
+            {/* Receiver Info */}
+            <div className="flex items-center gap-4 bg-gray-100 p-3 rounded">
+                <button 
+                    onClick={() => navigate(`/profile/${receiver.id}`)} 
+                    className="flex items-center gap-3"
+                >
+                    <img 
+                        src={receiver.profile_picture} 
+                        width="60" 
+                        height="60" 
+                        alt="Profile" 
+                        className="rounded-full object-cover"
+                    />
+                    <p className="text-lg font-semibold">{receiver.username}</p>
                 </button>
             </div>
 
-            <div>
-                { messageList.map(mess => (
-                    <div 
+            {/* Messages */}
+            <div className="space-y-4 max-h-[400px] overflow-y-auto">
+                {messageList.map((mess) => (
+                    <div
                         key={mess.id}
-                        className={
-                            mess.conversation === parseInt(convId)
-                            ? "my-message"
-                            : "other-message"
-                        }
-                        >
-                        <p>{mess.text}</p>
-                        <p>{getTime(mess.created_at)}</p>
-                        <p>{mess.is_read ? "✓✓ Read" : mess.is_received ? "✓ Delivered" : "⏳ Sent"}</p>
-                        <ul> {mess.attachments && mess.attachments.map(att => (
-                            <div>
-                            <li key={att.id}> {att.file}</li>
-                            <button onClick={() => handleDownload(att.file, att.file)}>
-                                Download {att.file}
-                            </button>    
-                            </div>
-                            ))}
-                        </ul>
+                        className={`p-3 rounded-lg w-fit max-w-[75%] ${mess.conversation === parseInt(convId)
+                            ? "bg-blue-100 self-end ml-auto text-right"
+                            : "bg-gray-100 self-start text-left"}`}
+                    >
+                        <p className="mb-1">{mess.text}</p>
+                        <p className="text-xs text-gray-500">{getTime(mess.created_at)}</p>
+                        <p className="text-xs text-gray-400 italic">
+                            {mess.is_read ? "✓✓ Read" : mess.is_received ? "✓ Delivered" : "⏳ Sent"}
+                        </p>
+
+                        {/* Attachments */}
+                        {mess.attachments?.length > 0 && (
+                            <ul className="mt-2 space-y-1">
+                                {mess.attachments.map((att) => (
+                                    <li key={att.id} className="flex justify-between items-center">
+                                        <span className="truncate">{att.file}</span>
+                                        <button
+                                            onClick={() => handleDownload(att.file, att.file)}
+                                            className="text-blue-600 hover:underline text-sm"
+                                        >
+                                            Download
+                                        </button>
+                                    </li>
+                                ))}
+                            </ul>
+                        )}
                     </div>
                 ))}
             </div>
 
-            <form onSubmit={(e) => {
-                e.preventDefault();
-                sendMessage();
-            }}>
+            {/* Message Input */}
+            <form
+                onSubmit={(e) => {
+                    e.preventDefault();
+                    sendMessage();
+                }}
+                className="flex flex-col space-y-3"
+            >
                 <input
                     type="text"
                     placeholder="Message"
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
+                    className="p-2 border rounded w-full"
                 />
-                <button type="button">+</button>
-                <button type="button" onClick={() => setShowFileUpload(true)}>File</button>
-                <div className="modal-overlays">
-                    <input type="file" onChange={(e) => setTempFile(e.target.files[0])} />
-                    <button onClick={handleSubmitFile}>Upload</button>
-                    <button onClick={() => setShowFileUpload(false) }>Cancel</button>
+                <div className="flex gap-3">
+                    <button type="button" className="px-3 py-1 bg-gray-300 rounded">+</button>
+                    <button
+                        type="button"
+                        onClick={() => setShowFileUpload(true)}
+                        className="px-3 py-1 bg-gray-300 rounded"
+                    >
+                        File
+                    </button>
+                    <button
+                        type="submit"
+                        className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                    >
+                        Send
+                    </button>
                 </div>
-                <button type="submit" className='submitButton'>Send</button>
+
+                {/* File Upload Modal */}
+                {showFileUpload && (
+                    <div className="bg-gray-50 p-4 rounded shadow-inner space-y-2">
+                        <input
+                            type="file"
+                            onChange={(e) => setTempFile(e.target.files[0])}
+                            className="block w-full"
+                        />
+                        <div className="flex gap-3">
+                            <button
+                                onClick={handleSubmitFile}
+                                className="px-3 py-1 bg-green-500 text-white rounded"
+                            >
+                                Upload
+                            </button>
+                            <button
+                                onClick={() => setShowFileUpload(false)}
+                                className="px-3 py-1 bg-red-400 text-white rounded"
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                )}
             </form>
         </div>
     );
+
 };
 
 export default ChatWindow;

@@ -15,16 +15,21 @@ import HomePage from './components/HomePage';
 
 function App() {
   return (
-    <div className='main'>
-      <Routes>
-        <Route path="/" element={<HomePage/>} />
-        <Route path="/skills/:id" element={<AdInfo />} />
-        <Route path="/auth" element={<AuthWindow/>}/>
-        <Route path="/conv" element={<Conversations />} />
-        <Route path="/conv/:convId" element={<ChatWindow />} />
-        <Route path="/my-profile" element={<UserProfile />} />
-        <Route path="/profile/:userId" element={<OtherProfile/>}/>
-      </Routes>
+    <div>
+      <head>
+        <link href="/dist/styles.css" rel="stylesheet"/>
+      </head>
+      <div className='main'>
+        <Routes>
+          <Route path="/" element={<HomePage/>} />
+          <Route path="/skills/:id" element={<AdInfo />} />
+          <Route path="/auth" element={<AuthWindow/>}/>
+          <Route path="/conv" element={<Conversations />} />
+          <Route path="/conv/:convId" element={<ChatWindow />} />
+          <Route path="/my-profile" element={<UserProfile />} />
+          <Route path="/profile/:userId" element={<OtherProfile/>}/>
+        </Routes>
+      </div>
     </div>
   );
 }

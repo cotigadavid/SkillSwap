@@ -21,11 +21,18 @@ const OtherProfile = () => {
         }, []);
 
     return (
-        <div>
-            <img src={`${user.profile_picture}`} width="100" height="100" alt="Profile" />
-            <UserInformationCard user={user}/>
-        </div>
+    <div className="flex flex-col items-center space-y-4 p-4">
+        <img
+        src={user.profile_picture}
+        alt="Profile"
+        width={100}
+        height={100}
+        className="rounded-full object-cover"
+        />
+        <UserInformationCard user={user} />
+    </div>
     );
+
     
 };
 
