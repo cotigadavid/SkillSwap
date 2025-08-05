@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Skill, CustomUser, Conversation, Message, Review, SkillSwapRequest
+from .models import Skill, CustomUser, Conversation, Message, MessageAttachment, Review, SkillSwapRequest
 from datetime import date
 from .models import CustomUser
 from django.db.models import Avg
@@ -142,27 +142,29 @@ class ConversationSerializer(serializers.ModelSerializer):
         if len(value) < 2:
             raise serializers.ValidationError("A conversation must have at least 2 participants.")
         return value
-    
-    def to_representation(self, instance):
-        rep = super().to_representation(instance)
-        rep['participants'] = [user.username for user in instance.participants.all()]
-        return rep
 
+
+class MessageAttachmentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MessageAttachment
+        fields = ['id', 'file', 'uploaded_at']
 
 class MessageSerializer(serializers.ModelSerializer):
+    attachments = MessageAttachmentSerializer(many=True, read_only=True)
     created_at = serializers.ReadOnlyField()
 
     class Meta:
         model = Message
         fields = '__all__'
 
-    def validate(self, data):
-        conversation = data['conversation']
-        sender = data['sender']
-        if sender not in conversation.participants.all():
-            raise serializers.ValidationError("Sender must be a participant in the conversation.")
-        return data
-    
+    def create(self, validated_data):
+        request = self.context.get('request')
+        files = request.FILES.getlist('attachments')
+        message = Message.objects.create(**validated_data)
+        for file in files:
+            MessageAttachment.objects.create(message=message, file=file)
+        return message
+
 
 class RegisterSerializer(serializers.ModelSerializer):
         

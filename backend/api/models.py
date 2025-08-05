@@ -2,9 +2,9 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.models import BaseUserManager
 from datetime import date
+from .storage import OverwriteStorage
 
 # Create your models here.
-
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, username, email, password=None):
@@ -17,7 +17,7 @@ class CustomUserManager(BaseUserManager):
         return user
 
 class CustomUser(AbstractUser):
-    profile_picture = models.ImageField(upload_to='profile_pictures/', blank=True, null=True)
+    profile_picture = models.ImageField(upload_to='profile_pictures/', storage=OverwriteStorage(), blank=True, null=True)
     phone_number = models.CharField(max_length=10)
     birth_date = models.DateField(blank=True, null=True)
     residing_city = models.CharField(max_length=50, blank=True, null=True)
@@ -48,7 +48,8 @@ class Skill(models.Model):
         return self.title
 
 class Conversation(models.Model):
-    participants = models.ManyToManyField(CustomUser, related_name='conversations')
+    sender = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="sent_conversations", default=-1)
+    receiver = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="received_conversations", default=-1)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -76,15 +77,16 @@ class Message(models.Model):
         null=True
     )
 
-    sender = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='sent_messages')
     text = models.CharField(max_length=1000)
     is_read = models.BooleanField(default=False)
     is_received = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f"Message from {self.sender} at {self.timestamp}"
     
+
+class MessageAttachment(models.Model):
+    message = models.ForeignKey(Message, on_delete=models.CASCADE, related_name="attachments")
+    file = models.FileField(upload_to='messages/', storage=OverwriteStorage())
+    uploaded_at = models.DateTimeField(auto_now_add=True)
 
 class Review(models.Model):
     stars = models.IntegerField(choices=[(1, '1'), (2, '2'), (3, '3'), (4, '4'), (5, '5')])
