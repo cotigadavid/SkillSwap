@@ -32,16 +32,16 @@ const SignupForm = () => {
 
         const data = await response.json();
 
-        const decoded = jwtDecode(data.access);
-        const userId = decoded.user_id;
-
-        localStorage.setItem('access', data.access);
-        localStorage.setItem('refresh', data.refresh);
-        localStorage.setItem('userId', userId);
-
         console.log(data);
 
-        navigate(-1);
+        // const decoded = jwtDecode(data.access);
+        // const userId = decoded.user_id;
+
+        // localStorage.setItem('access', data.access);
+        // localStorage.setItem('refresh', data.refresh);
+        // localStorage.setItem('userId', userId);
+
+        navigate("/");
     };
 
     const toggleShowPassword = () => {

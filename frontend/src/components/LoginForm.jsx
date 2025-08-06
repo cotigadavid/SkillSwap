@@ -3,6 +3,7 @@ import { useState } from "react";
 import PasswordInput from './PasswordInput';
 import { jwtDecode } from 'jwt-decode';
 import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 const LoginForm = () => {
     const [username, setUsername] = useState('');
@@ -29,6 +30,7 @@ const LoginForm = () => {
 
         const data = await response.json();
 
+        console.log(data);
         const decoded = jwtDecode(data.access);
         const userId = decoded.user_id;
 
@@ -38,38 +40,13 @@ const LoginForm = () => {
 
         console.log(data);
 
-        navigate(-1);
+        navigate("/");
     };
 
     const toggleShowPassword = () => {
         setShowPassword(prev => !prev);
     }
 
-    // return (
-    //     <div className='LoginForm'>
-    //         <form onSubmit={handleSubmit}>
-    //             <div>
-    //                 <label>Username</label>
-    //                 <input
-    //                     type="text"
-    //                     value={username}
-    //                     onChange={(e) => setUsername(e.target.value)}
-    //                     required
-    //                 />
-    //             </div>
-    //             <div>
-    //                 <label>Password</label>
-    //                 <PasswordInput
-    //                     value={password}
-    //                     onChange={(e) => setPassword(e.target.value)}
-    //                     showPassword={showPassword}
-    //                     toggleShowPassword={toggleShowPassword}
-    //                 />
-    //             </div>
-    //             <button type="submit" className='submitButton'>Log in</button>
-    //         </form>
-    //     </div>
-    // );
     return (
     <form onSubmit={handleSubmit} className="max-w-md mx-auto bg-white p-8 rounded-xl shadow-md">
       <h2 className="text-2xl font-semibold text-center mb-6">Log In</h2>
@@ -101,6 +78,15 @@ const LoginForm = () => {
       >
         Log in
       </button>
+      <Link to="/reset-password">
+        <button
+            type="button"
+            className="w-full py-3 mt-4 bg-yellow-300 text-lg font-medium rounded-md hover:bg-yellow-400 transition-colors"
+            
+        >
+            Forgot your password?
+        </button>
+      </Link>
     </form>
   );
 

@@ -3,34 +3,19 @@ import star from '../assets/star.png';
 
 function SkillAdvertisement({skill}) {
     return (
-    <div className="bg-white shadow-md rounded-md p-4 flex flex-col sm:flex-row items-start sm:items-center gap-4">
-        <img
-        className="w-16 h-16 rounded-full object-cover border"
-        src={skill.user.profile}
-        alt="Profile"
-        />
-        <img
-        className="w-24 h-24 object-cover rounded-md"
-        src={skill.skill_picture}
-        alt="Skill"
-        />
-
-        <div className="flex-1">
-        <p className="text-lg font-semibold text-gray-800">{skill.user.name}</p>
-        <p className="text-md text-gray-600">{skill.title}</p>
-
-        <div className="flex items-center gap-1 mt-1">
-            <img className="w-5 h-5" src={star} alt="Star" />
-            {/* <span>{skill.reviews.rating}</span>
-            <span className="text-sm text-gray-500">({skill.reviews.count})</span> */}
+        <div className="post">
+            <img src={skill.skill_picture} alt="Ad" className="ad-image" />
+            <img src={skill.user.profile} className="photo"></img>
+            <h3 className="name">{skill.user.name}</h3>
+            <p className="category">{skill.title}</p>
+            <p className="description">{skill.description}</p>
+            <div className="rating">
+                <img src={star} alt="Star" className="star" />
+                <span>{skill.reviews.rating}</span>
+                <span className="number-reviews">({skill.reviews.count})</span>
+            </div>
         </div>
-
-        <p className="mt-2 text-sm text-gray-700 line-clamp-3">{skill.description}</p>
-        <p className="text-sm text-gray-500">{skill.user.location}</p>
-        </div>
-    </div>
     );
-
 }
 
 export default SkillAdvertisement;

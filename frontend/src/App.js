@@ -14,13 +14,12 @@ import UserEditCard from './components/UserEditCard';
 import OtherProfile from './components/OtherProfile';
 import HomePage from './components/HomePage';
 import RequestList from './components/RequestList';
+import ConfirmEmailPage from './components/ConfirmEmailPage';
+import ResetPassword from './components/ResetPassword';
+import ChoosePassword from './components/ChoosePassword';
 
 function App() {
   return (
-    <div>
-      <head>
-        <link href="/dist/styles.css" rel="stylesheet"/>
-      </head>
       <div className='main'>
         <Routes>
           <Route path="/" element={<HomePage/>} />
@@ -31,9 +30,11 @@ function App() {
           <Route path="/my-profile" element={<UserProfile />} />
           <Route path="/profile/:userId" element={<OtherProfile/>}/>
           <Route path="/requests" element={<RequestList/>} />
+          <Route path="/confirm-email/" element={<ConfirmEmailPage />} />
+          <Route path="/reset-password/" element={<ResetPassword />} />
+          <Route path="/choose-password/:uid/:token/" element={<ChoosePassword />} />
         </Routes>
       </div>
-    </div>
   );
 }
 
