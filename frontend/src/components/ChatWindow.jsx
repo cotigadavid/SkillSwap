@@ -147,7 +147,6 @@ const ChatWindow = () => {
     
     return (
         <div className="max-w-3xl mx-auto p-4 space-y-6 bg-white rounded shadow-md">
-            {/* Receiver Info */}
             <div className="flex items-center gap-4 bg-gray-100 p-3 rounded">
                 <button 
                     onClick={() => navigate(`/profile/${receiver.id}`)} 
@@ -164,7 +163,6 @@ const ChatWindow = () => {
                 </button>
             </div>
 
-            {/* Messages */}
             <div className="space-y-4 max-h-[400px] overflow-y-auto">
                 {messageList.map((mess) => (
                     <div
@@ -179,7 +177,6 @@ const ChatWindow = () => {
                             {mess.is_read ? "✓✓ Read" : mess.is_received ? "✓ Delivered" : "⏳ Sent"}
                         </p>
 
-                        {/* Attachments */}
                         {mess.attachments?.length > 0 && (
                             <ul className="mt-2 space-y-1">
                                 {mess.attachments.map((att) => (
@@ -199,7 +196,6 @@ const ChatWindow = () => {
                 ))}
             </div>
 
-            {/* Message Input */}
             <form
                 onSubmit={(e) => {
                     e.preventDefault();
@@ -231,7 +227,6 @@ const ChatWindow = () => {
                     </button>
                 </div>
 
-                {/* File Upload Modal */}
                 {showFileUpload && (
                     <div className="bg-gray-50 p-4 rounded shadow-inner space-y-2">
                         <input

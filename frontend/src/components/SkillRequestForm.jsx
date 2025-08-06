@@ -1,42 +1,99 @@
 import React, {useState} from "react";
 
+function SkillRequestForm({ mySkills, onSubmit }) {
+  const [selectedSkills, setSelectedSkills] = useState([]);
+  const [message, setMessage] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-
-function SkillRequestForm({mySkills = [], onSubmit}) {
-    const [selectedSkillIds, setSelectedSkillIds] = useState([]);
-    const [message, setMessage] = useState("Hi there! Let's exchange skills!");
-
-    const handleSubmit = (event) => {
-        event.preventDefault();
-        if (selectedSkillIds.length > 0 && onSubmit) {
-            onSubmit(selectedSkillIds, message);
-        }
-    };
-
-    const handleChange = (event) => {
-        const selectedSkills = Array.from(event.target.selectedOptions)
-        const ids = selectedSkills.map(option => parseInt(option.value))
-        setSelectedSkillIds(ids);
-    };
-
-    return (
-        <form onSubmit={handleSubmit}>
-            <label htmlFor="selectSkill">Choose a skill to offer</label>
-                <select id="selectSkill" value={selectedSkillIds} onChange={handleChange} multiple required>
-                    <option value ="">Select</option> 
-                    {mySkills.map((skill) => (
-                        <option key={skill.id} value={skill.id}>
-                            {skill.title}
-                        </option>
-                    ))}  
-                </select>
-
-                <label htmlFor="message">Message(optional):</label>
-                <textarea id="message" value={message} onChange={(e) => setMessage(e.target.value)} placeholder="Write your message here..."/>
-
-                <button type="submit">Submit</button>
-        </form>
+  const handleSkillToggle = (skillId) => {
+    setSelectedSkills(prev =>
+      prev.includes(skillId)
+        ? prev.filter(id => id !== skillId)
+        : [...prev, skillId]
     );
-};
+  };
+
+  const handleSubmit = async () => {
+    if (selectedSkills.length === 0) return;
+    
+    setIsSubmitting(true);
+    await onSubmit(selectedSkills, message);
+    setIsSubmitting(false);
+  };
+
+  return (
+    <div className="bg-white border border-gray-300 rounded p-6">
+      <div className="text-center mb-6">
+        <h2 className="text-xl font-bold text-gray-800 mb-2">Select Your Skills to Offer</h2>
+        <p className="text-gray-600">Choose which skills you'd like to exchange</p>
+      </div>
+
+      <div className="space-y-6">
+        <div className="space-y-4">
+          <label className="block text-sm font-semibold text-gray-700 mb-3">
+            My Skills
+          </label>
+          <div className="space-y-2">
+            {mySkills.map((skill) => (
+              <label
+                key={skill.id}
+                className={`flex items-center p-3 rounded border cursor-pointer ${
+                  selectedSkills.includes(skill.id)
+                    ? 'bg-gray-50 border-gray-400'
+                    : 'bg-white border-gray-300 hover:border-gray-400'
+                }`}
+              >
+                <input
+                  type="checkbox"
+                  className="w-4 h-4 text-gray-600 focus:ring-gray-400 mr-3"
+                  checked={selectedSkills.includes(skill.id)}
+                  onChange={() => handleSkillToggle(skill.id)}
+                />
+                <span className={`font-medium ${
+                  selectedSkills.includes(skill.id) ? 'text-gray-800' : 'text-gray-700'
+                }`}>
+                  {skill.title}
+                </span>
+              </label>
+            ))}
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <label className="block text-sm font-semibold text-gray-700">
+            Message (optional)
+          </label>
+          <textarea
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            placeholder="Tell them why you're interested in this skill exchange..."
+            className="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-gray-400 resize-none"
+            rows="4"
+          />
+        </div>
+
+        <button
+          type="button"
+          onClick={handleSubmit}
+          disabled={selectedSkills.length === 0 || isSubmitting}
+          className={`w-full py-3 px-6 rounded font-semibold text-white ${
+            selectedSkills.length === 0 || isSubmitting
+              ? 'bg-gray-400 cursor-not-allowed'
+              : 'bg-gray-700 hover:bg-gray-800'
+          }`}
+        >
+          {isSubmitting ? (
+            <div className="flex items-center justify-center gap-2">
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+              Sending Request...
+            </div>
+          ) : (
+            'Send Skill Exchange Request'
+          )}
+        </button>
+      </div>
+    </div>
+  );
+}
 
 export default SkillRequestForm;

@@ -8,7 +8,6 @@ const SkillEdit = ( {skill, onClose} ) => {
     const [picture, setPicture] = useState(skill.picture);
     
     const handleSave = async () => {
-        
         const formData = new FormData();
         formData.append('title', title);
         formData.append('difficulty', difficulty);
@@ -28,78 +27,78 @@ const SkillEdit = ( {skill, onClose} ) => {
     };
 
     return (
-        <div className="max-w-md mx-auto p-6 bg-white rounded shadow-md">
-            <h2 className="text-xl font-semibold mb-6 text-center">Edit Skill</h2>
-            <form onSubmit={handleSave} className="space-y-5">
+        <div className="w-full">
+            <h2 className="text-xl font-semibold mb-6 text-gray-800">Edit Skill</h2>
+            <form onSubmit={handleSave} className="space-y-4">
                 <div>
-                    <label className="block mb-1 font-medium">Title</label>
+                    <label className="block mb-2 font-medium text-gray-700">Title</label>
                     <input
                         type="text"
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
                         required
-                        className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+                        className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:border-gray-400"
                     />
                 </div>
                 <div>
-                    <label className="block mb-1 font-medium">Difficulty</label>
+                    <label className="block mb-2 font-medium text-gray-700">Difficulty</label>
                     <input
                         type="text"
                         value={difficulty}
                         onChange={(e) => setDifficulty(e.target.value)}
                         required
-                        className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+                        className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:border-gray-400"
                     />
                 </div>
                 <div>
-                    <label className="block mb-1 font-medium">Hours needed</label>
+                    <label className="block mb-2 font-medium text-gray-700">Hours needed</label>
                     <input
                         type="number"
                         value={hours}
                         onChange={(e) => setHours(e.target.value)}
                         required
-                        className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+                        className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:border-gray-400"
                     />
                 </div>
                 <div>
-                    <label className="block mb-1 font-medium">Description</label>
-                    <input
-                        type="text"
+                    <label className="block mb-2 font-medium text-gray-700">Description</label>
+                    <textarea
                         value={description}
                         onChange={(e) => setDescription(e.target.value)}
                         required
-                        className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+                        rows="3"
+                        className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:border-gray-400 resize-none"
                     />
                 </div>
                 <div>
-                    <label className="block mb-2 font-medium">Skill Image</label>
+                    <label className="block mb-2 font-medium text-gray-700">Skill Image</label>
                     <input
                         type="file"
                         accept="image/*"
                         onChange={handlePictureChange}
-                        className="block w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 rounded"
+                        className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:border file:border-gray-300 file:rounded file:text-sm file:font-medium file:bg-gray-50 file:text-gray-700 hover:file:bg-gray-100"
                     />
                     {skill.image && (
                         <img
                             src={`http://localhost:8000${skill.image}`}
                             alt="Current"
                             width="100"
-                            className="mt-3 rounded"
+                            className="mt-3 rounded border border-gray-300"
                         />
                     )}
                 </div>
-                <div className="flex justify-between mt-6">
+                <div className="flex gap-3 pt-4">
                     <button
                         type="submit"
                         onClick={handleSave}
-                        className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+                        className="flex-1 px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-800"
                     >
                         Save
                     </button>
                     <button
                         type="button"
                         onClick={onClose}
-                        className="px-6 py-2 bg-gray-300 rounded hover:bg-gray-400 transition"
+                        className="flex-1 px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500"
                     >
                         Close
                     </button>
@@ -107,7 +106,6 @@ const SkillEdit = ( {skill, onClose} ) => {
             </form>
         </div>
     );
-
 };
 
 export default SkillEdit;

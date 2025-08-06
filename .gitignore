@@ -21,6 +21,4 @@ frontend/.env
 # OS-specific
 .DS_Store
 Thumbs.db
-git config --global core.autocrlf input
-
 
