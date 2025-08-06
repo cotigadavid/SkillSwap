@@ -8,18 +8,22 @@ const SkillEdit = ( {skill, onClose} ) => {
     const [picture, setPicture] = useState(skill.picture);
     
     const handleSave = async () => {
-        const formData = new FormData();
-        formData.append('title', title);
-        formData.append('difficulty', difficulty);
-        formData.append('hours_needed', hours);
-        formData.append('description', description);
-        if (picture)
-            formData.append('skill_picture', picture);
+        try {
+            const formData = new FormData();
+            formData.append('title', title);
+            formData.append('difficulty', difficulty);
+            formData.append('hours_needed', hours);
+            formData.append('description', description);
+            if (picture)
+                formData.append('skill_picture', picture);
 
-        await fetch(`http://localhost:8000/api/skills/${skill.id}/`, {
-            method: 'PATCH',
-            body: formData,
-        })
+            await fetch(`http://localhost:8000/api/skills/${skill.id}/`, {
+                method: 'PATCH',
+                body: formData,
+            })
+        } catch (error) {
+            console.error("Error fetching skill info: ", error);
+        }
     };
 
     const handlePictureChange = (e) => {

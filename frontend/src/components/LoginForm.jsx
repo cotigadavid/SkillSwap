@@ -11,27 +11,32 @@ const LoginForm = () => {
     const [showPassword, setShowPassword] = useState(false);
     const navigate = useNavigate();
     const handleSubmit = async (e) => {
-        e.preventDefault();
-        console.log('Username:', username);
-        console.log('Password:', password);
-        const response = await fetch('http://localhost:8000/api/token/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                username: username,
-                password: password
-            })
-        });
-        const data = await response.json();
-        const decoded = jwtDecode(data.access);
-        const userId = decoded.user_id;
-        localStorage.setItem('access', data.access);
-        localStorage.setItem('refresh', data.refresh);
-        localStorage.setItem('userId', userId);
-        console.log(data);
-        navigate(-1);
+        try {
+            e.preventDefault();
+            console.log('Username:', username);
+            console.log('Password:', password);
+            const response = await fetch('http://localhost:8000/api/token/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    username: username,
+                    password: password
+                })
+            });
+            const data = await response.json();
+            const decoded = jwtDecode(data.access);
+            const userId = decoded.user_id;
+            localStorage.setItem('access', data.access);
+            localStorage.setItem('refresh', data.refresh);
+            localStorage.setItem('userId', userId);
+            console.log(data);
+            navigate(-1);
+        } catch (error) {
+            console.error("Error logging in: ", error);
+            alert("Failed to log in. Please try again.");
+        }
     };
     const toggleShowPassword = () => {
         setShowPassword(prev => !prev);

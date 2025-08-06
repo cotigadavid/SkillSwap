@@ -13,12 +13,16 @@ const UserProfile = () => {
     
     useEffect(() =>  {
         const fetchUser = async () => {
-            const response = await fetch(`http://localhost:8000/api/users/${userId}/`, {
-                method: 'GET'
-            });
-            const data = await response.json();
-            console.log(data);
-            setUser(data);
+            try {
+                const response = await fetch(`http://localhost:8000/api/users/${userId}/`, {
+                    method: 'GET'
+                });
+                const data = await response.json();
+                console.log(data);
+                setUser(data);
+            } catch (error) {
+                console.error("Error fetching user: ", error);
+            }
         };
         fetchUser();
     }, [showAddPhoto, infoState]);

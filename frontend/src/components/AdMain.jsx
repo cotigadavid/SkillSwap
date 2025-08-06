@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
 import SkillRequestForm from "./SkillRequestForm";
 import AdInfo from "./AdInfo";
 import { useParams } from "react-router-dom";
@@ -13,26 +13,29 @@ function AdMain() {
     const [successMessage, setSuccessMessage] = useState(null);
     
     useEffect(() => {
-        const fetchData = async() => {
-            const response = await fetch(`http://localhost:8000/api/skills-public/${id}`);
-            const ad = await response.json();
-            setAd(ad);
+        const fetchData = async () => {
+            try {
+                const [adResponse, skillsResponse] = await Promise.all([
+                    secureAxios.get(`/skills-public/${id}`),
+                    secureAxios.get('/skills/')
+                ]);
+
+                setAd(adResponse.data);
+                setMySkills(skillsResponse.data.results);
+
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                setErrorMessage('Failed to load data. Please try again.');
+            }
         }
 
         fetchData();
     }, [id]);
 
-    useEffect(() => {
-        const fetchSkills = async() => {
-            const response = await secureAxios.get('/skills/');
-            setMySkills(response.data);
-        }
 
-        fetchSkills();
-    }, []);
-
-    const handleSubmit = async (skillIds, message) => {
+    const handleSubmit = useCallback(async (skillIds, message) => {
         
+
         setErrorMessage(null);
         setSuccessMessage(null);
 
@@ -55,7 +58,7 @@ function AdMain() {
             }
         }
         
-    };
+    }, [ad]);
 
     return (
         <div className="min-h-screen bg-white py-8 px-4">

@@ -10,18 +10,23 @@ const AddProfilePicture = ( {closeFunction} ) => {
     const handleSubmit = async () => {
         if (!file)
             return;
-        const userId = localStorage.getItem('userId');
-        const formData = new FormData();
-        formData.append('profile_picture', file);
-        const response = await fetch(`http://localhost:8000/api/users/${userId}/`, {
-            method: 'PATCH',
-            body: formData
-        });
-        console.log(response);
-        if (response.ok) {
-            alert('Profile picture updated!');
-        } else {
-            alert('Upload failed');
+        try {
+            const userId = localStorage.getItem('userId');
+            const formData = new FormData();
+            formData.append('profile_picture', file);
+            const response = await fetch(`http://localhost:8000/api/users/${userId}/`, {
+                method: 'PATCH',
+                body: formData
+            });
+            console.log(response);
+            if (response.ok) {
+                alert('Profile picture updated!');
+            } else {
+                alert('Upload failed');
+            }
+        } catch (error) {
+            console.error('Upload error: ', error);
+            alert("There was an error uploading the image. Please try again.")
         }
         closeFunction();
     }

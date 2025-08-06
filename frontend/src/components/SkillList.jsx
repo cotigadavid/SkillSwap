@@ -14,23 +14,31 @@ function SkillList() {
     const [mediumChecked, setMediumChecked] = useState(true);
     const [hardChecked, setHardChecked] = useState(true);
     const [seriousChecked, setSeriousChecked] = useState(true);
+    const [page, setPage] = useState(1);
+    const [nextPage, setNextPage] = useState(null);
+    const [prevPage, setPrevPage] = useState(null);
+
 
     const handleSearch = async () => {
-        console.log(query);
         try {
             const response = await secureAxios.get(`/skills_search/`, {
-                params: { query }
+                params: { query, page }
             });
-            setSkills(response.data);
-            console.log(response.data);
+
+            console.log(response.data.results);
+
+            setSkills(response.data.results);
+            setNextPage(response.data.next !== null);
+            setPrevPage(response.data.previous !== null);
         } catch (error) {
             console.error("Search failed", error);
         }
     };
+
     
     useEffect(() => {
         handleSearch();
-    }, []);
+    }, [page]);
     
 
     return (
@@ -44,7 +52,10 @@ function SkillList() {
             className="flex-1 px-4 py-3 rounded border border-gray-300 focus:outline-none focus:border-gray-400 bg-white"
         />
         <button
-            onClick={handleSearch}
+             onClick={() => {
+                setPage(1);  
+                handleSearch(); 
+            }}
             className="bg-gray-700 hover:bg-gray-800 text-white px-6 py-3 rounded font-medium"
         >
             Search
@@ -147,6 +158,23 @@ function SkillList() {
                 </div>
             </Link>
             ))}
+        </div>
+            <div className="flex justify-center mt-8 gap-4">
+            <button
+                onClick={() => setPage((p) => Math.max(p - 1, 1))}
+                disabled={!prevPage}
+                className={`px-4 py-2 rounded font-medium ${prevPage ? 'bg-gray-700 text-white hover:bg-gray-800' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}
+            >
+                ← Previous
+            </button>
+            <span className="self-center text-gray-700 font-semibold">Page {page}</span>
+            <button
+                onClick={() => setPage((p) => p + 1)}
+                disabled={!nextPage}
+                className={`px-4 py-2 rounded font-medium ${nextPage ? 'bg-gray-700 text-white hover:bg-gray-800' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}
+            >
+                Next →
+            </button>
         </div>
     </div>
     );

@@ -14,11 +14,15 @@ function SkillRequestForm({ mySkills, onSubmit }) {
   };
 
   const handleSubmit = async () => {
-    if (selectedSkills.length === 0) return;
-    
-    setIsSubmitting(true);
-    await onSubmit(selectedSkills, message);
-    setIsSubmitting(false);
+      try {
+          if (selectedSkills.length === 0) return;
+          
+          setIsSubmitting(true);
+          await onSubmit(selectedSkills, message);
+      } catch(error) {
+          console.error("Failed to send request: ", error);
+      }
+      setIsSubmitting(false);
   };
 
   return (

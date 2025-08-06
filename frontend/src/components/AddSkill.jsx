@@ -8,11 +8,16 @@ const AddSkill = () => {
     
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const response = await secureAxios.post('skills/', {
-            title: title,
-            difficulty: difficulty,
-            hours_needed: hours,
-        });
+        try {
+            const response = await secureAxios.post('skills/', {
+                title: title,
+                difficulty: difficulty,
+                hours_needed: hours,
+            });
+        } catch (error) {
+            console.error('Error adding skill:', error);
+            alert("There was an error adding the skill. Please try again.");
+        }
     };
     
     return (

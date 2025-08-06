@@ -14,19 +14,23 @@ const UserEditCard = ({ user }) => {
     const [editingSkillId, setEditingSkillId] = useState(null);
 
     const handleSave = async () => {
-        const userId = localStorage.getItem('userId');
-        await fetch(`http://localhost:8000/api/users/${userId}/`, {
-            method: 'PATCH',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                phone_number: phoneNumber,
-                birth_date: birthDate,
-                residing_city: residingCity,
-                residing_county: residingCounty
+        try {
+            const userId = localStorage.getItem('userId');
+            await fetch(`http://localhost:8000/api/users/${userId}/`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    phone_number: phoneNumber,
+                    birth_date: birthDate,
+                    residing_city: residingCity,
+                    residing_county: residingCounty
+                })
             })
-        })
+        } catch (error) {
+            console.error("Error fetching users: ", error);
+        }
     };
 
     const navigate = useNavigate();
@@ -36,13 +40,17 @@ const UserEditCard = ({ user }) => {
     };  
 
     const handleDeleteSkill = async (skillId) => {
-        const response = await secureAxios(`skills/${skillId}/`, {
-            method: 'DELETE'
-        });
-        if (response.status === 204 || response.status === 200) {
-            setSkills(prevSkills => prevSkills.filter(skill => skill.id !== skillId));
+        try {
+            const response = await secureAxios(`skills/${skillId}/`, {
+                method: 'DELETE'
+            });
+            if (response.status === 204 || response.status === 200) {
+                setSkills(prevSkills => prevSkills.filter(skill => skill.id !== skillId));
+            }
+            console.log(response);
+        } catch (error) {
+            console.error("Error deleting skill: ", error);
         }
-        console.log(response);
     };
 
     return (

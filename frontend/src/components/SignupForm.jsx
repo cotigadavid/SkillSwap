@@ -14,34 +14,39 @@ const SignupForm = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log('Email:', email);
-        console.log('Username:', username);
-        console.log('Password:', password);
+        try {
+            console.log('Email:', email);
+            console.log('Username:', username);
+            console.log('Password:', password);
 
-        const response = await fetch('http://localhost:8000/api/register/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                username: username,
-                email: email,
-                password: password
-            })
-        });
+            const response = await fetch('http://localhost:8000/api/register/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    username: username,
+                    email: email,
+                    password: password
+                })
+            });
 
-        const data = await response.json();
+            const data = await response.json();
 
-        const decoded = jwtDecode(data.access);
-        const userId = decoded.user_id;
+            const decoded = jwtDecode(data.access);
+            const userId = decoded.user_id;
 
-        localStorage.setItem('access', data.access);
-        localStorage.setItem('refresh', data.refresh);
-        localStorage.setItem('userId', userId);
+            localStorage.setItem('access', data.access);
+            localStorage.setItem('refresh', data.refresh);
+            localStorage.setItem('userId', userId);
 
-        console.log(data);
+            console.log(data);
 
-        navigate(-1);
+            navigate(-1);
+        } catch (error) {
+            console.error("Error signing up: ", error);
+            alert("Failed to sign up. Please try again.");
+        }
     };
 
    const toggleShowPassword = () => {
