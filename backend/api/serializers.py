@@ -124,6 +124,7 @@ class SkillRequestListSerializer(serializers.ModelSerializer):
     def get_sender(self, obj):
         sender = obj.sender
         return {
+            "id": sender.id,
             "name": f"{sender.last_name} {sender.first_name}",
             "profile_picture" : (
                 self.context['request'].build_absolute_uri(obj.sender.profile_picture.url)

@@ -1,5 +1,6 @@
 import secureAxios from "../secureAxios";
 import React, { useEffect, useState } from "react";
+import { useNavigate } from 'react-router-dom';
 import RequestCard from "./RequestCard";
 
 function RequestList() {
@@ -8,6 +9,8 @@ function RequestList() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [currentUser, setCurrentUser] = useState(null);
+
+    const navigate = useNavigate();
 
     useEffect(() => {
         fetchUserId();
@@ -38,7 +41,7 @@ function RequestList() {
             setPendingRequests(pendingResponse.data);
             
             const allRequestsResponse = await secureAxios.get('/requests/');
-            const acceptedReqs = allRequestsResponse.data.filter(req => 
+            const acceptedReqs = allRequestsResponse.data.results.filter(req => 
                 req.status === 'accepted' && req.receiver === currentUser.id
             );
             setAcceptedRequests(acceptedReqs);
@@ -71,9 +74,21 @@ function RequestList() {
         }
     };
 
-    const handleChat = (userId) => {
-        alert(`trebuie legat chatul aici ${userId}`);
-    };
+    const handleChat = async (userId) => {
+    try {
+        console.log(userId);
+        const response = await secureAxios.post('/conversations/create_conversation/', {
+            receiver_id: userId,
+        });
+
+        const conversation = response.data;
+        navigate(`/conv/${conversation.id}`);
+    } catch (error) {
+        console.error("Error creating conversation:", error);
+        alert('Failed to open chat.');
+    }
+};
+
 
 
     if (loading) {
