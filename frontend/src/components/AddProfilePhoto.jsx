@@ -2,61 +2,64 @@ import { useState } from "react";
 
 const AddProfilePicture = ( {closeFunction} ) => {
     const [file, setFile] = useState(null);
-    
+   
     const handleFileChange = (e) => {
         setFile(e.target.files[0]);
     };
-
+    
     const handleSubmit = async () => {
         if (!file)
             return;
-
-        const userId = localStorage.getItem('userId');
-
-        const formData = new FormData();
-        formData.append('profile_picture', file);
-
-        const response = await fetch(`http://localhost:8000/api/users/${userId}/`, {
-            method: 'PATCH',
-            body: formData
-        });
-
-        console.log(response);
-
-        if (response.ok) {
-            alert('Profile picture updated!');
-        } else {
-            alert('Upload failed');
+        try {
+            const userId = localStorage.getItem('userId');
+            const formData = new FormData();
+            formData.append('profile_picture', file);
+            const response = await fetch(`http://localhost:8000/api/users/${userId}/`, {
+                method: 'PATCH',
+                body: formData
+            });
+            console.log(response);
+            if (response.ok) {
+                alert('Profile picture updated!');
+            } else {
+                alert('Upload failed');
+            }
+        } catch (error) {
+            console.error('Upload error: ', error);
+            alert("There was an error uploading the image. Please try again.")
         }
-
         closeFunction();
     }
-
+    
     return (
-        <div className="flex flex-col items-center space-y-4 p-6 bg-white rounded-lg shadow-lg w-full max-w-sm mx-auto">
-            <input 
-                type="file" 
-                onChange={handleFileChange} 
-                accept="image/*" 
-                className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-            />
-            <div className="flex gap-4">
-                <button 
-                    onClick={handleSubmit}
-                    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
-                >
-                    Upload
-                </button>
-                <button 
-                    onClick={closeFunction}
-                    className="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400 transition"
-                >
-                    Cancel
-                </button>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white border border-gray-300 rounded p-6 shadow-sm w-full max-w-sm mx-4">
+                <h3 className="text-lg font-semibold mb-4 text-gray-800">Update Profile Picture</h3>
+                
+                <input
+                    type="file"
+                    onChange={handleFileChange}
+                    accept="image/*"
+                    className="block w-full text-sm text-gray-500 mb-4 file:mr-4 file:py-2 file:px-4 file:border file:border-gray-300 file:rounded file:text-sm file:font-medium file:bg-gray-50 file:text-gray-700 hover:file:bg-gray-100"
+                />
+                
+                <div className="flex gap-3">
+                    <button
+                        onClick={handleSubmit}
+                        className="flex-1 px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-800"
+                    >
+                        Upload
+                    </button>
+                    <button
+                        onClick={closeFunction}
+                        className="flex-1 px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500"
+                    >
+                        Cancel
+                    </button>
+                </div>
             </div>
         </div>
     );
-
 };
 
 export default AddProfilePicture;

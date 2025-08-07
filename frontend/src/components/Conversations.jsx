@@ -9,17 +9,21 @@ const Conversations = () => {
     const userId = localStorage.getItem('userId');
     useEffect(() =>  {
         const fetchConversations = async () => {
-            const response = await fetch(`http://localhost:8000/api/conversations/`, {
-                method: 'GET',
-                credentials: 'include',
-            });
-            const data = await response.json();
-            const filtered = data.filter(convo => 
-                convo.sender && convo.sender === (parseInt(userId))
-            );
-            
-            setConversations(filtered);
-            console.log(filtered);
+            try {
+                const response = await fetch(`http://localhost:8000/api/conversations/`, {
+                    method: 'GET',
+                    credentials: 'include',
+                });
+                const data = await response.json();
+                const filtered = data.filter(convo => 
+                    convo.sender && convo.sender === (parseInt(userId))
+                );
+                
+                setConversations(filtered);
+                console.log(filtered);
+            } catch (error) {
+                console.error("Error fetching conversation: ", error);
+            }
 
         };
 

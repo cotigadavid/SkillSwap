@@ -1,32 +1,26 @@
-//import '../styling/LoginForm.css'
-import eye from '../assets/eye.png';
-import eye_closed from '../assets/eye_closed.png';
+import { useState } from "react";
+import { Eye, EyeOff, ArrowLeft, X } from "lucide-react";
 
 const PasswordInput = ({ value, onChange, showPassword, toggleShowPassword }) => {
   return (
-    <div className="flex items-center border border-gray-300 rounded-md overflow-hidden focus-within:ring-2 focus-within:ring-yellow-400">
+    <div className="relative">
       <input
-        type={showPassword ? 'text' : 'password'}
+        type={showPassword ? "text" : "password"}
         value={value}
         onChange={onChange}
         required
-        className="flex-1 px-4 py-2 focus:outline-none"
+        placeholder="Password"
+        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all duration-200 text-gray-900 placeholder-gray-500 pr-12"
       />
       <button
         type="button"
         onClick={toggleShowPassword}
-        className="px-4 py-2 bg-transparent hover:bg-gray-100"
+        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors duration-200"
       >
-        <img
-          src={showPassword ? eye_closed : eye}
-          width="20"
-          height="20"
-          alt="Toggle visibility"
-        />
+        {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
       </button>
     </div>
   );
 };
-
 
 export default PasswordInput;

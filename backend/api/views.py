@@ -12,6 +12,7 @@ from rest_framework.decorators import action, api_view, permission_classes
 from django.http import JsonResponse
 from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank, TrigramSimilarity
 from django.db.models.functions import Greatest
+from rest_framework.pagination import PageNumberPagination
 from .utils import send_confirmation_email, send_reset_password_email
 from django.utils.http import urlsafe_base64_decode
 from django.contrib.auth.tokens import default_token_generator
@@ -31,18 +32,20 @@ class SkillViewSet(viewsets.ModelViewSet):
     serializer_class = SkillSerializer
 
     def get_queryset(self):
-        return Skill.objects.filter(user=self.request.user)
+        return Skill.objects.filter(user=self.request.user).select_related('user')
 
     def get_serializer_context(self):
         return {'request': self.request}
     
 class SkillPublicViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Skill.objects.all()
     serializer_class = SkillPublicSerializer
     permission_classes = [IsAuthenticated]
 
     def get_serializer_context(self):
         return {'request': self.request}
+    
+    def get_queryset(self):
+        return Skill.objects.select_related('user').prefetch_related('reviews')
     
 class SkillSwapRequestViewSet(viewsets.ModelViewSet):
     queryset = SkillSwapRequest.objects.all()
@@ -228,23 +231,28 @@ def MarkConversationAsReceived(request):
 def search_skills(request):
     query = request.GET.get('query', '')
 
+    base_queryset = Skill.objects.select_related('user').prefetch_related('reviews')
+
     if (query):
         vector = SearchVector('title')
         search_query = SearchQuery(query)
-        skills = Skill.objects.annotate(
+        skills = base_queryset.annotate(
             rank=SearchRank(vector, search_query),
             similarity=TrigramSimilarity('title', query),
             score=Greatest(SearchRank(vector, search_query), TrigramSimilarity('title', query) - 0.3)
         ).filter(score__gt=0.0).order_by('-score')
     else:
-        skills = Skill.objects.all()
+        skills = base_queryset.all()
 
     if (skills.count() == 0):
-        skills = Skill.objects.all()
+        skills = base_queryset.all()
 
-    serializer = SkillPublicSerializer(skills, many=True, context={"request": request})
-    return Response(serializer.data)
+    paginator = PageNumberPagination()
+    paginator.page_size = 20 
 
+    result_page = paginator.paginate_queryset(skills, request)
+    serializer = SkillPublicSerializer(result_page, many=True, context={"request": request})
+    return paginator.get_paginated_response(serializer.data)
 
 class ConfirmEmailView(APIView):
     permission_classes = [AllowAny]

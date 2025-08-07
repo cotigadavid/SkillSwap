@@ -19,45 +19,53 @@ const ChatWindow = () => {
     
     const sendMessage = async () => {
 
-        const formData = new FormData();
-        formData.append("conversation", parseInt(convId));
-        formData.append("text", message);
-        formData.append("is_received", false);
-        formData.append("is_sent", false);
+        try {
+            const formData = new FormData();
+            formData.append("conversation", parseInt(convId));
+            formData.append("text", message);
+            formData.append("is_received", false);
+            formData.append("is_sent", false);
 
-        for (let file of filesArray) {
-            formData.append("attachments", file);
+            for (let file of filesArray) {
+                formData.append("attachments", file);
+            }
+
+            const response = await secureAxios.post('messages/', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+                credentials: 'include',
+            });
+        } catch (error) {
+            console.error('Error sending message:', error);
         }
-
-        const response = await secureAxios.post('messages/', formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data',
-            },
-            credentials: 'include',
-        });
     };
 
     useEffect(() => {
         const fetchConv = async () => {
-            const convRes = await fetch(`http://localhost:8000/api/conversations/${convId}/`, {
+            try {
+                const convRes = await fetch(`http://localhost:8000/api/conversations/${convId}/`, {
                 credentials: 'include'
-            });
-            const convData = await convRes.json();
+              });
+              const convData = await convRes.json();
 
-            if (convData?.sender && convData?.receiver) {
-                const [receiverRes, senderRes] = await Promise.all([
-                    fetch(`http://localhost:8000/api/users/${convData.receiver}/`, {
-                        credentials: 'include'
-                    }),
-                    fetch(`http://localhost:8000/api/users/${convData.sender}/`, {
-                        credentials: 'include'
-                    }),
-                ]);
-                const receiverData = await receiverRes.json();
-                const senderData = await senderRes.json();
+              if (convData?.sender && convData?.receiver) {
+                  const [receiverRes, senderRes] = await Promise.all([
+                      fetch(`http://localhost:8000/api/users/${convData.receiver}/`, {
+                          credentials: 'include'
+                      }),
+                      fetch(`http://localhost:8000/api/users/${convData.sender}/`, {
+                          credentials: 'include'
+                      }),
+                  ]);
+                  const receiverData = await receiverRes.json();
+                  const senderData = await senderRes.json();
 
-                setReceiver(receiverData);
-                setSender(senderData);
+                  setReceiver(receiverData);
+                  setSender(senderData);
+                }
+            } catch (error) {
+                console.error("Error fetching conversation: ", error);
             }
         };
 
@@ -68,18 +76,22 @@ const ChatWindow = () => {
         if (!receiver?.id || !sender?.id) return;
 
         const fetchOppositeConv = async () => {
-            const response = await fetch(`http://localhost:8000/api/conversations/`, {
-                method: 'GET',
-                credentials: 'include',
-            });
-            const data = await response.json();
-    
-            const filtered = data.find(conv => 
-                conv.sender === receiver.id && conv.receiver === sender.id
-            );
-            setOppositeConv(filtered);
-            console.log("opposite: ")
-            console.log(filtered);
+            try {
+                const response = await fetch(`http://localhost:8000/api/conversations/`, {
+                    method: 'GET',
+                    credentials: 'include',
+                });
+                const data = await response.json();
+        
+                const filtered = data.find(conv => 
+                    conv.sender === receiver.id && conv.receiver === sender.id
+                );
+                setOppositeConv(filtered);
+                console.log("opposite: ")
+                console.log(filtered);
+            } catch (error) {
+                console.error("Error fetching opposite conversation: ", error);
+            }
         };
     
         fetchOppositeConv();
@@ -88,17 +100,20 @@ const ChatWindow = () => {
 
     useEffect(() =>  {
         const fetchMessage = async () => {
-            const response = await fetch(`http://localhost:8000/api/messages/`, {
-                method: 'GET',
-                credentials: 'include',
+            try {
+                const response = await fetch(`http://localhost:8000/api/messages/`, {
+                    method: 'GET',
+                    credentials: 'include',
+                });
+                const data = await response.json();
+                const filtered = data.filter(mess => 
+                    mess.conversation === parseInt(convId) || mess.conversation === parseInt(oppositeConv.id)
+                );
+                setMessageList(filtered);
+                console.log(oppositeConv);
+            } catch (error) {
+                console.error("Error fetching message: ", error);
             }
-        );
-            const data = await response.json();
-            const filtered = data.filter(mess => 
-                mess.conversation === parseInt(convId) || mess.conversation === parseInt(oppositeConv.id)
-            );
-            setMessageList(filtered);
-            console.log(oppositeConv);
         };
         
         fetchMessage();
@@ -131,9 +146,13 @@ const ChatWindow = () => {
     }, [oppositeConv]);
 
     const handleSubmitFile = async () => {
-        setFilesArray(f => [...f, tempFile]);
-        setShowFileUpload(false);
-        console.log(filesArray);
+        try {
+            setFilesArray(f => [...f, tempFile]);
+            setShowFileUpload(false);
+            console.log(filesArray);
+        } catch (error) {
+            console.error('Error adding file:', error);
+        }
     };
     
     const handleDownload = async (fileUrl, fileName) => {
@@ -160,7 +179,6 @@ const ChatWindow = () => {
     
     return (
         <div className="max-w-3xl mx-auto p-4 space-y-6 bg-white rounded shadow-md">
-            {/* Receiver Info */}
             <div className="flex items-center gap-4 bg-gray-100 p-3 rounded">
                 <button 
                     onClick={() => navigate(`/profile/${receiver.id}`)} 
@@ -177,7 +195,6 @@ const ChatWindow = () => {
                 </button>
             </div>
 
-            {/* Messages */}
             <div className="space-y-4 max-h-[400px] overflow-y-auto">
                 {messageList.map((mess) => (
                     <div
@@ -192,7 +209,6 @@ const ChatWindow = () => {
                             {mess.is_read ? "✓✓ Read" : mess.is_received ? "✓ Delivered" : "⏳ Sent"}
                         </p>
 
-                        {/* Attachments */}
                         {mess.attachments?.length > 0 && (
                             <ul className="mt-2 space-y-1">
                                 {mess.attachments.map((att) => (
@@ -212,7 +228,6 @@ const ChatWindow = () => {
                 ))}
             </div>
 
-            {/* Message Input */}
             <form
                 onSubmit={(e) => {
                     e.preventDefault();
@@ -244,7 +259,6 @@ const ChatWindow = () => {
                     </button>
                 </div>
 
-                {/* File Upload Modal */}
                 {showFileUpload && (
                     <div className="bg-gray-50 p-4 rounded shadow-inner space-y-2">
                         <input
