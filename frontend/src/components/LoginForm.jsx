@@ -3,6 +3,7 @@ import { jwtDecode } from 'jwt-decode';
 import { useNavigate } from "react-router-dom";
 import { Eye, EyeOff, ArrowLeft, X } from "lucide-react";
 import PasswordInput from "./PasswordInput";
+import { Link } from "react-router-dom";
 
 const LoginForm = () => {
 
@@ -15,8 +16,10 @@ const LoginForm = () => {
             e.preventDefault();
             console.log('Username:', username);
             console.log('Password:', password);
+
             const response = await fetch('http://localhost:8000/api/token/', {
                 method: 'POST',
+                credentials: 'include',
                 headers: {
                     'Content-Type': 'application/json'
                 },
@@ -25,14 +28,13 @@ const LoginForm = () => {
                     password: password
                 })
             });
+
             const data = await response.json();
-            const decoded = jwtDecode(data.access);
-            const userId = decoded.user_id;
-            localStorage.setItem('access', data.access);
-            localStorage.setItem('refresh', data.refresh);
-            localStorage.setItem('userId', userId);
+
+            localStorage.setItem('userId', data["userId"]);
             console.log(data);
-            navigate(-1);
+
+            navigate("/");
         } catch (error) {
             console.error("Error logging in: ", error);
             alert("Failed to log in. Please try again.");
@@ -41,7 +43,6 @@ const LoginForm = () => {
     const toggleShowPassword = () => {
         setShowPassword(prev => !prev);
     }
-
     
     return (
         <div className="space-y-4">
@@ -66,6 +67,14 @@ const LoginForm = () => {
             >
                 Log in
             </button>
+            <Link to="/reset-password">
+              <button
+                  type="button"
+                  className="w-full py-3 mt-4 bg-yellow-300 text-lg font-medium rounded-md hover:bg-yellow-400 transition-colors"
+              >
+                  Forgot your password?
+              </button>
+            </Link>
         </div>
     );
 };

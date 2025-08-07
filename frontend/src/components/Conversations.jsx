@@ -11,7 +11,8 @@ const Conversations = () => {
         const fetchConversations = async () => {
             try {
                 const response = await fetch(`http://localhost:8000/api/conversations/`, {
-                    method: 'GET'
+                    method: 'GET',
+                    credentials: 'include',
                 });
                 const data = await response.json();
                 const filtered = data.filter(convo => 

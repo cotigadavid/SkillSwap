@@ -33,6 +33,8 @@ ALLOWED_HOSTS = []
 MEDIA_URL = '/media/'        # URL prefix to access media files
 MEDIA_ROOT = BASE_DIR / 'media'  # The folder where files will be stored
 
+FRONTEND_URL = "http://localhost:3000" 
+BACKEND_URL = "http://localhost:8000"
 # Application definition
 
 INSTALLED_APPS = [
@@ -61,7 +63,7 @@ MIDDLEWARE = [
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'api.authentication.CookieJWTAuthentication',
     ),
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 20 
@@ -72,6 +74,7 @@ SIMPLE_JWT = {
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
 }
 
+CORS_ALLOW_CREDENTIALS = True
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
@@ -115,6 +118,13 @@ DATABASES = {
         'POOL_MODE': 'transaction',
     }
 }
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'test.tweb.node@gmail.com'
+EMAIL_HOST_PASSWORD = 'xdqswyrleddghrgm' # Use an app password, not your Gmail login
 
 
 # Password validation

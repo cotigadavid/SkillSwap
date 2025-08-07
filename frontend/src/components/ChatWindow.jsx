@@ -33,7 +33,8 @@ const ChatWindow = () => {
             const response = await secureAxios.post('messages/', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
-                }
+                },
+                credentials: 'include',
             });
         } catch (error) {
             console.error('Error sending message:', error);
@@ -43,19 +44,25 @@ const ChatWindow = () => {
     useEffect(() => {
         const fetchConv = async () => {
             try {
-                const convRes = await fetch(`http://localhost:8000/api/conversations/${convId}/`);
-                const convData = await convRes.json();
+                const convRes = await fetch(`http://localhost:8000/api/conversations/${convId}/`, {
+                credentials: 'include'
+              });
+              const convData = await convRes.json();
 
-                if (convData?.sender && convData?.receiver) {
-                    const [receiverRes, senderRes] = await Promise.all([
-                        fetch(`http://localhost:8000/api/users/${convData.receiver}/`),
-                        fetch(`http://localhost:8000/api/users/${convData.sender}/`),
-                    ]);
-                    const receiverData = await receiverRes.json();
-                    const senderData = await senderRes.json();
+              if (convData?.sender && convData?.receiver) {
+                  const [receiverRes, senderRes] = await Promise.all([
+                      fetch(`http://localhost:8000/api/users/${convData.receiver}/`, {
+                          credentials: 'include'
+                      }),
+                      fetch(`http://localhost:8000/api/users/${convData.sender}/`, {
+                          credentials: 'include'
+                      }),
+                  ]);
+                  const receiverData = await receiverRes.json();
+                  const senderData = await senderRes.json();
 
-                    setReceiver(receiverData);
-                    setSender(senderData);
+                  setReceiver(receiverData);
+                  setSender(senderData);
                 }
             } catch (error) {
                 console.error("Error fetching conversation: ", error);
@@ -72,6 +79,7 @@ const ChatWindow = () => {
             try {
                 const response = await fetch(`http://localhost:8000/api/conversations/`, {
                     method: 'GET',
+                    credentials: 'include',
                 });
                 const data = await response.json();
         
@@ -94,7 +102,8 @@ const ChatWindow = () => {
         const fetchMessage = async () => {
             try {
                 const response = await fetch(`http://localhost:8000/api/messages/`, {
-                    method: 'GET'
+                    method: 'GET',
+                    credentials: 'include',
                 });
                 const data = await response.json();
                 const filtered = data.filter(mess => 
@@ -122,9 +131,12 @@ const ChatWindow = () => {
     useEffect(() =>  {
         const markAllAsRead = async () => {
             try {
-                await secureAxios.post('/mark-read/', {
+                const response = await secureAxios.post('/mark-read/', {
+                    credentials: 'include',
                     conversation_id: oppositeConv.id
                 });
+                console.log("fasgag");
+                console.log(response);
             } catch (err) {
                 console.error("Failed to mark messages as read", err.message);
             }

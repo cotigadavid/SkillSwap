@@ -33,16 +33,9 @@ const SignupForm = () => {
 
             const data = await response.json();
 
-            const decoded = jwtDecode(data.access);
-            const userId = decoded.user_id;
-
-            localStorage.setItem('access', data.access);
-            localStorage.setItem('refresh', data.refresh);
-            localStorage.setItem('userId', userId);
-
             console.log(data);
 
-            navigate(-1);
+            navigate("/");
         } catch (error) {
             console.error("Error signing up: ", error);
             alert("Failed to sign up. Please try again.");
