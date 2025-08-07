@@ -5,8 +5,8 @@ from .models import Skill, CustomUser, Conversation, Message, Review, SkillSwapR
 from rest_framework import viewsets, status, serializers
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.exceptions import ValidationError
+from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.exceptions import ValidationError, AuthenticationFailed
 from django.db import models
 from rest_framework.decorators import action, api_view, permission_classes
 from django.http import JsonResponse
@@ -18,6 +18,11 @@ from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth import get_user_model
 from django.shortcuts import redirect
 from django.conf import settings
+from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+)
 
 # Create your views here.
 
@@ -34,6 +39,7 @@ class SkillViewSet(viewsets.ModelViewSet):
 class SkillPublicViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Skill.objects.all()
     serializer_class = SkillPublicSerializer
+    permission_classes = [IsAuthenticated]
 
     def get_serializer_context(self):
         return {'request': self.request}
@@ -144,10 +150,12 @@ class SkillSwapRequestViewSet(viewsets.ModelViewSet):
 class SkillPublicViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Skill.objects.all()
     serializer_class = SkillPublicSerializer
+    permission_classes = [IsAuthenticated]
 
 class CustomUserViewSet(viewsets.ModelViewSet):
     queryset = CustomUser.objects.all()
     serializer_class = CustomUserSerializer
+    permission_classes = [IsAuthenticated]
 
     @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
     def me(self, request):
@@ -157,12 +165,16 @@ class CustomUserViewSet(viewsets.ModelViewSet):
 class ConversationViewSet(viewsets.ModelViewSet):
     queryset = Conversation.objects.all()
     serializer_class = ConversationSerializer
+    permission_classes = [IsAuthenticated]
 
 class MessageViewSet(viewsets.ModelViewSet):
     queryset = Message.objects.all()
     serializer_class = MessageSerializer
+    permission_classes = [IsAuthenticated]
 
 class RegisterView(APIView):
+    permission_classes = [AllowAny]
+
     def post(self, request):
         serializer = RegisterSerializer(data=request.data)
         if serializer.is_valid():
@@ -180,6 +192,7 @@ class RegisterView(APIView):
 class ReviewView(viewsets.ModelViewSet):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
+    permission_classes = [AllowAny]
 
 
 @api_view(['POST'])
@@ -234,6 +247,8 @@ def search_skills(request):
 
 
 class ConfirmEmailView(APIView):
+    permission_classes = [AllowAny]
+
     def get(self, request, uidb64, token):
         try:
             uid = urlsafe_base64_decode(uidb64).decode()
@@ -248,6 +263,8 @@ class ConfirmEmailView(APIView):
         return Response({"error": "Invalid or expired token"}, status=400)
     
 class ResetPasswordView(APIView):
+    permission_classes = [AllowAny]
+
     def post(self, request):
         data = request.data
         email = data.get('email')
@@ -262,6 +279,8 @@ class ResetPasswordView(APIView):
         return Response({"message": "Email sent"}, status=status.HTTP_200_OK)
 
 class ChoosePasswordView(APIView):
+    permission_classes = [AllowAny]
+
     def post(self, request, uid, token):
 
         data = request.data
@@ -275,3 +294,75 @@ class ChoosePasswordView(APIView):
             return Response({"message": "Password updated successfully"}, status=status.HTTP_200_OK)
 
         return Response({"error": "Invalid or expired token"}, status=400)
+
+
+class CookieTokenObtainPairView(TokenObtainPairView):
+    def post(self, request, *args, **kwargs):
+        
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)  # This will authenticate
+
+        # Get the user from the validated data
+        user = serializer.user
+        
+        response = super().post(request, *args, **kwargs)
+
+        if response.status_code == 200:
+            refresh = response.data["refresh"]
+            access = response.data["access"]
+
+            response.set_cookie(
+                key='access_token',
+                value=access,
+                max_age=5 * 60,  # 5 minutes
+                httponly=True,
+                secure=True,  
+                samesite='Lax',
+                path='/'
+            )
+
+            response.set_cookie(
+                key='refresh_token',
+                value=refresh,
+                max_age=7 * 24 * 60 * 60,  # 7 days
+                httponly=True,
+                secure=True,
+                samesite='Lax',
+                path='/api/token/refresh/' 
+            )
+
+            del response.data["access"]
+            del response.data["refresh"]
+
+            response.data["userId"] = user.id
+            response.data["username"] = user.username
+
+        return response
+
+class CookieTokenRefreshView(TokenRefreshView):
+    def post(self, request, *args, **kwargs):
+        refresh_token = request.COOKIES.get('refresh_token')
+
+        if refresh_token is None:
+            raise AuthenticationFailed("No refresh token provided in cookies")
+
+        try:
+            refresh = RefreshToken(refresh_token)
+            access_token = str(refresh.access_token)
+        except Exception:
+            raise AuthenticationFailed("Invalid or expired refresh token")
+
+        response = Response({'detail': 'Access token refreshed'}, status=status.HTTP_200_OK)
+        cookie_max_age = 7 * 24 * 60 * 60
+
+        response.set_cookie(
+            key='access_token',
+            value=access_token,
+            max_age=cookie_max_age,
+            httponly=True,
+            secure=False,  # use False in local dev if not on HTTPS
+            samesite='Lax',
+            path='/'
+        )
+
+        return response

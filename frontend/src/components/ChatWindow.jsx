@@ -32,19 +32,26 @@ const ChatWindow = () => {
         const response = await secureAxios.post('messages/', formData, {
             headers: {
                 'Content-Type': 'multipart/form-data',
-            }
+            },
+            credentials: 'include',
         });
     };
 
     useEffect(() => {
         const fetchConv = async () => {
-            const convRes = await fetch(`http://localhost:8000/api/conversations/${convId}/`);
+            const convRes = await fetch(`http://localhost:8000/api/conversations/${convId}/`, {
+                credentials: 'include'
+            });
             const convData = await convRes.json();
 
             if (convData?.sender && convData?.receiver) {
                 const [receiverRes, senderRes] = await Promise.all([
-                    fetch(`http://localhost:8000/api/users/${convData.receiver}/`),
-                    fetch(`http://localhost:8000/api/users/${convData.sender}/`),
+                    fetch(`http://localhost:8000/api/users/${convData.receiver}/`, {
+                        credentials: 'include'
+                    }),
+                    fetch(`http://localhost:8000/api/users/${convData.sender}/`, {
+                        credentials: 'include'
+                    }),
                 ]);
                 const receiverData = await receiverRes.json();
                 const senderData = await senderRes.json();
@@ -63,6 +70,7 @@ const ChatWindow = () => {
         const fetchOppositeConv = async () => {
             const response = await fetch(`http://localhost:8000/api/conversations/`, {
                 method: 'GET',
+                credentials: 'include',
             });
             const data = await response.json();
     
@@ -81,8 +89,10 @@ const ChatWindow = () => {
     useEffect(() =>  {
         const fetchMessage = async () => {
             const response = await fetch(`http://localhost:8000/api/messages/`, {
-                method: 'GET'
-            });
+                method: 'GET',
+                credentials: 'include',
+            }
+        );
             const data = await response.json();
             const filtered = data.filter(mess => 
                 mess.conversation === parseInt(convId) || mess.conversation === parseInt(oppositeConv.id)
@@ -106,9 +116,12 @@ const ChatWindow = () => {
     useEffect(() =>  {
         const markAllAsRead = async () => {
             try {
-                await secureAxios.post('/mark-read/', {
+                const response = await secureAxios.post('/mark-read/', {
+                    credentials: 'include',
                     conversation_id: oppositeConv.id
                 });
+                console.log("fasgag");
+                console.log(response);
             } catch (err) {
                 console.error("Failed to mark messages as read", err.message);
             }

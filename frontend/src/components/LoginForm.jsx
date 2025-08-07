@@ -19,6 +19,7 @@ const LoginForm = () => {
 
         const response = await fetch('http://localhost:8000/api/token/', {
             method: 'POST',
+            credentials: 'include',
             headers: {
                 'Content-Type': 'application/json'
             },
@@ -31,12 +32,10 @@ const LoginForm = () => {
         const data = await response.json();
 
         console.log(data);
-        const decoded = jwtDecode(data.access);
-        const userId = decoded.user_id;
 
-        localStorage.setItem('access', data.access);
-        localStorage.setItem('refresh', data.refresh);
-        localStorage.setItem('userId', userId);
+        // localStorage.setItem('access', data.access);
+        // localStorage.setItem('refresh', data.refresh);
+        localStorage.setItem('userId', data["userId"]);
 
         console.log(data);
 

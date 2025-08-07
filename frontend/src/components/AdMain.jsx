@@ -14,7 +14,9 @@ function AdMain() {
     
     useEffect(() => {
         const fetchData = async() => {
-            const response = await fetch(`http://localhost:8000/api/skills-public/${id}`);
+            const response = await fetch(`http://localhost:8000/api/skills-public/${id}/`, {
+                credentials: 'include',
+            });
             const ad = await response.json();
             setAd(ad);
         }
