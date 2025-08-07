@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { CheckCircle } from 'lucide-react';
 import { useParams } from "react-router-dom";
 import { useState } from "react";
+import secureAxios from "../secureAxios";
 
 const ConfirmEmailPage = () => {
     const [password, setPassword] = useState('');
@@ -9,8 +10,7 @@ const ConfirmEmailPage = () => {
     const { uid, token } = useParams();
 
     const handleSubmit = async () => {
-        const response = await fetch(`http://localhost:8000/api/choose-password/${uid}/${token}/`, {
-            method: 'POST',
+        const response = await secureAxios.post(`choose-password/${uid}/${token}/`, {
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -19,7 +19,7 @@ const ConfirmEmailPage = () => {
             })
         })
 
-        const data = response.json();
+        const data = response.data;
         console.log(data);
     };
 

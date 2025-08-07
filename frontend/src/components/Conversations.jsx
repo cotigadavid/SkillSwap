@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import secureAxios from "../secureAxios";
 
 const Conversations = () => {
     const [conversations, setConversations] = useState([]);
@@ -10,12 +11,9 @@ const Conversations = () => {
     useEffect(() =>  {
         const fetchConversations = async () => {
             try {
-                const response = await fetch(`http://localhost:8000/api/conversations/`, {
-                    method: 'GET',
-                    credentials: 'include',
-                });
-                const data = await response.json();
-                const filtered = data.filter(convo => 
+                const response = await secureAxios.get(`http://localhost:8000/api/conversations/`);
+                const data = response.data;
+                const filtered = data.results.filter(convo => 
                     convo.sender && convo.sender === (parseInt(userId))
                 );
                 
@@ -24,7 +22,6 @@ const Conversations = () => {
             } catch (error) {
                 console.error("Error fetching conversation: ", error);
             }
-
         };
 
         fetchConversations();

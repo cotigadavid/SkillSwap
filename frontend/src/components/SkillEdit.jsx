@@ -1,4 +1,5 @@
 import { useState } from "react";
+import secureAxios from "../secureAxios";
 
 const SkillEdit = ( {skill, onClose} ) => {
     const [title, setTitle] = useState(skill.title);
@@ -17,8 +18,7 @@ const SkillEdit = ( {skill, onClose} ) => {
             if (picture)
                 formData.append('skill_picture', picture);
 
-            await fetch(`http://localhost:8000/api/skills/${skill.id}/`, {
-                method: 'PATCH',
+            await secureAxios.patch(`http://localhost:8000/api/skills/${skill.id}/`, {
                 body: formData,
             })
         } catch (error) {

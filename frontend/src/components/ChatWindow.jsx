@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router-dom";
 import secureAxios from "../secureAxios";
 import { useNavigate } from "react-router-dom";
 
 const ChatWindow = () => {
-    const [message, setMessage] = useState('');
+    const inputRef = useRef();
     const [messageList, setMessageList] = useState([]);
     const [oppositeConv, setOppositeConv] = useState('');
     const [receiver, setReceiver] = useState('');
@@ -12,12 +12,13 @@ const ChatWindow = () => {
     const [filesArray, setFilesArray] = useState([]);
     const [tempFile, setTempFile] = useState(null);
     const [showFileUpload, setShowFileUpload] = useState(false);
+    const [blocked, setBlocked] = useState(false);
     
     const { convId } = useParams();
 
     const navigate = useNavigate();
     
-    const sendMessage = async () => {
+    const sendMessage = async (message) => {
 
         try {
             const formData = new FormData();
@@ -36,6 +37,11 @@ const ChatWindow = () => {
                 },
                 credentials: 'include',
             });
+
+            console.log(response);
+
+            await fetchMessage();
+
         } catch (error) {
             console.error('Error sending message:', error);
         }
@@ -44,28 +50,27 @@ const ChatWindow = () => {
     useEffect(() => {
         const fetchConv = async () => {
             try {
-                const convRes = await fetch(`http://localhost:8000/api/conversations/${convId}/`, {
-                credentials: 'include'
-              });
-              const convData = await convRes.json();
+                const convRes = await secureAxios.get(`conversations/${convId}/`);
 
-              if (convData?.sender && convData?.receiver) {
-                  const [receiverRes, senderRes] = await Promise.all([
-                      fetch(`http://localhost:8000/api/users/${convData.receiver}/`, {
-                          credentials: 'include'
-                      }),
-                      fetch(`http://localhost:8000/api/users/${convData.sender}/`, {
-                          credentials: 'include'
-                      }),
-                  ]);
-                  const receiverData = await receiverRes.json();
-                  const senderData = await senderRes.json();
+                const convData = convRes.data;
 
-                  setReceiver(receiverData);
-                  setSender(senderData);
-                }
+                if (convData?.sender && convData?.receiver) {
+                    const [receiverRes, senderRes] = await Promise.all([
+                        secureAxios.get(`users/${convData.receiver}/`),
+                        secureAxios.get(`users/${convData.sender}/`),
+                    ]);
+                    const receiverData = receiverRes.data;
+                    const senderData = senderRes.data;
+                    setReceiver(receiverData);
+                    setSender(senderData);
+                  }
             } catch (error) {
-                console.error("Error fetching conversation: ", error);
+                if (error.response && error.response.status === 403) {
+                    console.error("Access denied to this conversation.");
+                    setMessageList([]);
+                    setBlocked(true);
+                } else
+                    console.error("Error fetching conversation: ", error);
             }
         };
 
@@ -77,18 +82,13 @@ const ChatWindow = () => {
 
         const fetchOppositeConv = async () => {
             try {
-                const response = await fetch(`http://localhost:8000/api/conversations/`, {
-                    method: 'GET',
-                    credentials: 'include',
-                });
-                const data = await response.json();
+                const response = await secureAxios.get(`conversations/`);
+                const data = response.data;
         
-                const filtered = data.find(conv => 
+                const filtered = data.results.find(conv => 
                     conv.sender === receiver.id && conv.receiver === sender.id
                 );
                 setOppositeConv(filtered);
-                console.log("opposite: ")
-                console.log(filtered);
             } catch (error) {
                 console.error("Error fetching opposite conversation: ", error);
             }
@@ -98,24 +98,20 @@ const ChatWindow = () => {
     
     }, [receiver, sender]);
 
+    const fetchMessage = async () => {
+        try {
+            const response = await secureAxios.get(`messages/`);
+            const data = await response.data;
+            const filtered = data.filter(mess => 
+                mess.conversation === parseInt(convId) || mess.conversation === parseInt(oppositeConv.id)
+            );
+            setMessageList(filtered);
+        } catch (error) {
+            console.error("Error fetching message: ", error);
+        }
+    };
+
     useEffect(() =>  {
-        const fetchMessage = async () => {
-            try {
-                const response = await fetch(`http://localhost:8000/api/messages/`, {
-                    method: 'GET',
-                    credentials: 'include',
-                });
-                const data = await response.json();
-                const filtered = data.filter(mess => 
-                    mess.conversation === parseInt(convId) || mess.conversation === parseInt(oppositeConv.id)
-                );
-                setMessageList(filtered);
-                console.log(oppositeConv);
-            } catch (error) {
-                console.error("Error fetching message: ", error);
-            }
-        };
-        
         fetchMessage();
     }, [oppositeConv]);
     
@@ -131,12 +127,12 @@ const ChatWindow = () => {
     useEffect(() =>  {
         const markAllAsRead = async () => {
             try {
-                const response = await secureAxios.post('/mark-read/', {
-                    credentials: 'include',
-                    conversation_id: oppositeConv.id
-                });
-                console.log("fasgag");
-                console.log(response);
+                if (oppositeConv != '') {
+                    const response = await secureAxios.post('/mark-read/', {
+                        credentials: 'include',
+                        conversation_id: oppositeConv.id
+                    });
+                }
             } catch (err) {
                 console.error("Failed to mark messages as read", err.message);
             }
@@ -177,6 +173,15 @@ const ChatWindow = () => {
         }
     };
     
+    if (blocked) {
+        return (
+            <div className="max-w-3xl mx-auto p-4 space-y-6 bg-white rounded shadow-md text-center">
+                <p className="text-red-500 text-xl font-semibold">You do not have access to this conversation.</p>
+            </div>
+        );
+    }
+
+    
     return (
         <div className="max-w-3xl mx-auto p-4 space-y-6 bg-white rounded shadow-md">
             <div className="flex items-center gap-4 bg-gray-100 p-3 rounded">
@@ -206,7 +211,7 @@ const ChatWindow = () => {
                         <p className="mb-1">{mess.text}</p>
                         <p className="text-xs text-gray-500">{getTime(mess.created_at)}</p>
                         <p className="text-xs text-gray-400 italic">
-                            {mess.is_read ? "✓✓ Read" : mess.is_received ? "✓ Delivered" : "⏳ Sent"}
+                            {mess.is_read ? "✓✓ Read" : mess.is_received ? "✓ Received" : "Sent"}
                         </p>
 
                         {mess.attachments?.length > 0 && (
@@ -231,15 +236,18 @@ const ChatWindow = () => {
             <form
                 onSubmit={(e) => {
                     e.preventDefault();
-                    sendMessage();
+                    const inputValue = inputRef.current.value;
+                    sendMessage(inputValue);
+                    inputRef.current.value = "";
                 }}
                 className="flex flex-col space-y-3"
             >
                 <input
                     type="text"
                     placeholder="Message"
-                    value={message}
-                    onChange={(e) => setMessage(e.target.value)}
+                    // value={tempMessage}
+                    // onChange={(e) => setTempMessage(e.target.value)}
+                    ref={inputRef}
                     className="p-2 border rounded w-full"
                 />
                 <div className="flex gap-3">

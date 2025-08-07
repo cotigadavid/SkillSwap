@@ -16,8 +16,7 @@ const UserEditCard = ({ user }) => {
     const handleSave = async () => {
         try {
             const userId = localStorage.getItem('userId');
-            await fetch(`http://localhost:8000/api/users/${userId}/`, {
-                method: 'PATCH',
+            await secureAxios.patch(`http://localhost:8000/api/users/${userId}/`, {
                 headers: {
                     'Content-Type': 'application/json',
                 },

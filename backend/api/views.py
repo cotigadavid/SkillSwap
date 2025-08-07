@@ -19,6 +19,7 @@ from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth import get_user_model
 from django.shortcuts import redirect
 from django.conf import settings
+from .permissions import IsOwner
 from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
@@ -168,12 +169,13 @@ class CustomUserViewSet(viewsets.ModelViewSet):
 class ConversationViewSet(viewsets.ModelViewSet):
     queryset = Conversation.objects.all()
     serializer_class = ConversationSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsOwner]
 
 class MessageViewSet(viewsets.ModelViewSet):
     queryset = Message.objects.all()
     serializer_class = MessageSerializer
     permission_classes = [IsAuthenticated]
+    pagination_class = None
 
 class RegisterView(APIView):
     permission_classes = [AllowAny]
@@ -201,7 +203,7 @@ class ReviewView(viewsets.ModelViewSet):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def MarkConversationAsRead(request):
-    print(request)
+    print(request.data.get('conversation_id'))
     conversation_id = request.data.get('conversation_id')
     if not conversation_id: 
         return Response({'error': 'Missing conversation_id'}, status=400)

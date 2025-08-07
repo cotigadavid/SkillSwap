@@ -1,6 +1,7 @@
 import UserInformationCard from "./UserInformationCard";
 import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
+import secureAxios from "../secureAxios";
 
 const OtherProfile = () => {
     const [user, setUser] = useState('');
@@ -10,11 +11,8 @@ const OtherProfile = () => {
     useEffect(() =>  {
             const fetchUser = async () => {
                 try {
-                    const response = await fetch(`http://localhost:8000/api/users/${userId}/`, {
-                        method: 'GET',
-                        credentials: 'include',
-                    });
-                    const data = await response.json();
+                    const response = await secureAxios.get(`http://localhost:8000/api/users/${userId}/`);
+                    const data = response.data;
                     console.log(data);
                     setUser(data);
                 } catch (error) {

@@ -4,6 +4,7 @@ import UserInformationCard from "./UserInformationCard";
 import UserEditCard from "./UserEditCard";
 import AddProfilePicture from "./AddProfilePhoto";
 import edit from '../assets/edit.png'
+import secureAxios from "../secureAxios";
 
 const UserProfile = () => {
     const [user, setUser] = useState(null);
@@ -14,11 +15,8 @@ const UserProfile = () => {
     useEffect(() =>  {
         const fetchUser = async () => {
             try {
-                const response = await fetch(`http://localhost:8000/api/users/${userId}/`, {
-                    method: 'GET',
-                    credentials: 'include',
-                });
-                const data = await response.json();
+                const response = await secureAxios.get(`http://localhost:8000/api/users/${userId}/`);
+                const data = response.data;
                 console.log(data);
                 setUser(data);
             } catch (error) {

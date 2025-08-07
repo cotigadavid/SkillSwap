@@ -14,33 +14,51 @@ const SignupForm = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        try {
-            console.log('Email:', email);
-            console.log('Username:', username);
-            console.log('Password:', password);
 
+        if (!email || !username || !password) {
+            alert("All fields are required.");
+            return;
+        }
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            alert("Please enter a valid email address.");
+            return;
+        }
+
+        if (username.length < 3 || !/^[a-zA-Z0-9_]+$/.test(username)) {
+            alert("Username must be at least 3 characters and contain only letters, numbers, or underscores.");
+            return;
+        }
+
+        const passwordRegex = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
+        if (!passwordRegex.test(password)) {
+            alert("Password must be at least 8 characters long and include at least one uppercase letter and one number.");
+            return;
+        }
+
+        try {
             const response = await fetch('http://localhost:8000/api/register/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({
-                    username: username,
-                    email: email,
-                    password: password
-                })
+                body: JSON.stringify({ username, email, password })
             });
 
             const data = await response.json();
 
-            console.log(data);
-
-            navigate("/");
+            if (response.ok) {
+                navigate("/");
+            } else {
+                alert(data?.detail || "Signup failed.");
+            }
         } catch (error) {
-            console.error("Error signing up: ", error);
+            console.error("Error signing up:", error);
             alert("Failed to sign up. Please try again.");
         }
     };
+
 
    const toggleShowPassword = () => {
         setShowPassword(prev => !prev);

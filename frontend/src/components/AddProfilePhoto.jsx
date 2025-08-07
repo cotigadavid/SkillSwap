@@ -1,4 +1,5 @@
 import { useState } from "react";
+import secureAxios from "../secureAxios";
 
 const AddProfilePicture = ( {closeFunction} ) => {
     const [file, setFile] = useState(null);
@@ -14,8 +15,7 @@ const AddProfilePicture = ( {closeFunction} ) => {
             const userId = localStorage.getItem('userId');
             const formData = new FormData();
             formData.append('profile_picture', file);
-            const response = await fetch(`http://localhost:8000/api/users/${userId}/`, {
-                method: 'PATCH',
+            const response = await secureAxios.patch(`users/${userId}/`, {
                 body: formData
             });
             console.log(response);

@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { Eye, EyeOff, ArrowLeft, X } from "lucide-react";
 import PasswordInput from "./PasswordInput";
 import { Link } from "react-router-dom";
+import secureAxios from "../secureAxios";
 
 const LoginForm = () => {
 
@@ -19,7 +20,7 @@ const LoginForm = () => {
 
             const response = await fetch('http://localhost:8000/api/token/', {
                 method: 'POST',
-                credentials: 'include',
+                withCredentials: true,
                 headers: {
                     'Content-Type': 'application/json'
                 },
@@ -31,8 +32,8 @@ const LoginForm = () => {
 
             const data = await response.json();
 
-            localStorage.setItem('userId', data["userId"]);
             console.log(data);
+            localStorage.setItem('userId', data["userId"]);
 
             navigate("/");
         } catch (error) {
