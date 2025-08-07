@@ -24,6 +24,8 @@ from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
 )
+from django.db.models import Q
+
 
 # Create your views here.
 
@@ -170,6 +172,33 @@ class ConversationViewSet(viewsets.ModelViewSet):
     serializer_class = ConversationSerializer
     permission_classes = [IsAuthenticated]
 
+    @action(detail=False, methods=['post'])
+    def create_conversation(self, request):
+        User = get_user_model()
+
+        sender = request.user
+        receiver_id = request.data.get('receiver_id')
+
+        if not receiver_id:
+            return Response({'error': 'receiver_id is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            receiver = User.objects.get(id=receiver_id)
+        except User.DoesNotExist:
+            return Response({'error': 'Receiver not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        convo = Conversation.objects.filter(
+            (Q(sender=sender) & Q(receiver=receiver)) | (Q(sender=receiver) & Q(receiver=sender))
+        ).first()
+
+        if convo:
+            serializer = self.get_serializer(convo)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        convo = Conversation.objects.create(sender=sender, receiver=receiver)
+        serializer = self.get_serializer(convo)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
 class MessageViewSet(viewsets.ModelViewSet):
     queryset = Message.objects.all()
     serializer_class = MessageSerializer
@@ -308,9 +337,8 @@ class CookieTokenObtainPairView(TokenObtainPairView):
     def post(self, request, *args, **kwargs):
         
         serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)  # This will authenticate
+        serializer.is_valid(raise_exception=True) 
 
-        # Get the user from the validated data
         user = serializer.user
         
         response = super().post(request, *args, **kwargs)

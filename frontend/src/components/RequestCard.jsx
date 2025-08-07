@@ -2,6 +2,7 @@ import secureAxios from "../secureAxios";
 import React, { useEffect, useState } from "react";
 
 const RequestCard = ({request, showActions, handleAccept, handleDecline, handleChat}) => {
+    console.log('request.sender:', request.sender);
     return (
         <div className="border border-gray-300 rounded-lg p-4 mb-3 bg-white shadow-sm">
             <div className="flex items-start justify-between">

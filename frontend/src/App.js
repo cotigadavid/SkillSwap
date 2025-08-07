@@ -1,5 +1,5 @@
 import './App.css';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, useNavigate } from 'react-router-dom';
 import SkillList from './components/SkillList';
 import UserProfile from './components/UserProfile';
 import AdInfo from './components/AdInfo';
@@ -17,25 +17,29 @@ import RequestList from './components/RequestList';
 import ConfirmEmailPage from './components/ConfirmEmailPage';
 import ResetPassword from './components/ResetPassword';
 import ChoosePassword from './components/ChoosePassword';
+import NavBar from './components/NavBar';
+
 
 function App() {
+  const navigate = useNavigate();
+
   return (
-      <div className='main'>
-        <Routes>
-          <Route path="/" element={<HomePage/>} />
-          <Route path="/skills/:id" element={<AdMain />} />
-          <Route path="/auth" element={<AuthWindow/>}/>
-          <Route path="/conv" element={<Conversations />} />
-          <Route path="/conv/:convId" element={<ChatWindow />} />
-          <Route path="/my-profile" element={<UserProfile />} />
-          <Route path="/profile/:userId" element={<OtherProfile/>}/>
-          <Route path="/requests" element={<RequestList/>} />
-          <Route path="/confirm-email/" element={<ConfirmEmailPage />} />
-          <Route path="/reset-password/" element={<ResetPassword />} />
-          <Route path="/choose-password/:uid/:token/" element={<ChoosePassword />} />
-        </Routes>
-      </div>
+    <div className='main'>
+      <NavBar onNavigate={navigate} /> 
+      <Routes>
+        <Route path="/" element={<HomePage/>} />
+        <Route path="/skills/:id" element={<AdMain />} />
+        <Route path="/auth" element={<AuthWindow/>}/>
+        <Route path="/conv" element={<Conversations />} />
+        <Route path="/conv/:convId" element={<ChatWindow />} />
+        <Route path="/my-profile" element={<UserProfile />} />
+        <Route path="/profile/:userId" element={<OtherProfile/>}/>
+        <Route path="/requests" element={<RequestList/>} />
+        <Route path="/confirm-email/" element={<ConfirmEmailPage />} />
+        <Route path="/reset-password/" element={<ResetPassword />} />
+        <Route path="/choose-password/:uid/:token/" element={<ChoosePassword />} />
+      </Routes>
+    </div>
   );
 }
-
 export default App;
