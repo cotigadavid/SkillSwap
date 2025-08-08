@@ -18,7 +18,7 @@ jobs:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
         ports:
-          - 5432:5432  # Add this port mapping
+          - 5432:5432
         options: >-
           --health-cmd "pg_isready -U postgres"
           --health-interval 10s
@@ -27,11 +27,9 @@ jobs:
 
     env:
       CI: 'true'
-      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-      DATABASE_URL: ${{ secrets.DATABASE_URL }}
-      SECRET_KEY: ${{ secrets.SECRET_KEY }}
-      DEBUG: ${{ secrets.DEBUG }}
-      ALLOWED_HOSTS: ${{ secrets.ALLOWED_HOSTS }}
+      SECRET_KEY: 'ci-test-key-not-for-production'  # You can hardcode this for CI
+      DEBUG: 'False'
+      ALLOWED_HOSTS: 'localhost,127.0.0.1'
 
     steps:
     - uses: actions/checkout@v3
@@ -42,24 +40,24 @@ jobs:
         python-version: '3.12'
 
     - name: Install dependencies
+      working-directory: backend
       run: |
-        cd backend
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
     - name: Wait for Postgres
       run: |
-        until pg_isready -h localhost -p 5432 -U postgres; do  # Changed to localhost
+        until pg_isready -h localhost -p 5432 -U postgres; do
           echo "Waiting for Postgres..."
           sleep 1
         done
 
-    - name: Run migrations
+    - name: Setup database
+      working-directory: backend
       run: |
-        cd backend
-        python manage.py migrate
+        python manage.py migrate --run-syncdb
 
     - name: Run tests
+      working-directory: backend
       run: |
-        cd backend
         python manage.py test --keepdb --verbosity=2
