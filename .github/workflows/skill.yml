@@ -56,11 +56,18 @@ jobs:
           sleep 1
         done
 
+    - name: Check applied migrations
+      working-directory: backend
+      run: python manage.py showmigrations
+
     - name: Run migrations
       run: |
         cd backend
-        python manage.py makemigrations
         python manage.py migrate
+
+    - name: Check applied migrations
+      working-directory: backend
+      run: python manage.py showmigrations
 
     - name: Run tests
       run: |
