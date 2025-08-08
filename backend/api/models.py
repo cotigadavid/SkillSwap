@@ -7,11 +7,11 @@ from .storage import OverwriteStorage
 # Create your models here.
 
 class CustomUserManager(BaseUserManager):
-    def create_user(self, username, email, password=None):
+    def create_user(self, username, email, password=None, **extra_fields):
         if not email:
             raise ValueError("Email required.")
         email = self.normalize_email(email)
-        user = self.model(username=username, email=email)
+        user = self.model(username=username, email=email, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
         return user
@@ -48,8 +48,8 @@ class Skill(models.Model):
         return self.title
 
 class Conversation(models.Model):
-    sender = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="sent_conversations", default=-1)
-    receiver = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="received_conversations", default=-1)
+    sender = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="sent_conversations")
+    receiver = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="received_conversations")
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
