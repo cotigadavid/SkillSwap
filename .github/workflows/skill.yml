@@ -52,6 +52,17 @@ jobs:
           sleep 1
         done
 
+    - name: Debug Django setup
+      working-directory: backend
+      run: |
+        python manage.py check
+        python manage.py shell -c "
+        import django.apps
+        print('Installed apps:', [app.name for app in django.apps.apps.get_app_configs()])
+        from django.conf import settings
+        print('INSTALLED_APPS:', settings.INSTALLED_APPS)
+        "
+
     - name: Setup database
       working-directory: backend
       run: |
@@ -59,7 +70,8 @@ jobs:
         find . -path "*/migrations/*.py" -not -name "__init__.py" -delete
         find . -path "*/migrations/*.pyc" -delete
         # Create fresh migrations for this database setup
-        python manage.py makemigrations
+        python manage.py makemigrations api
+        python manage.py makemigrations 
         python manage.py migrate
 
     - name: Run tests
