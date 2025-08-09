@@ -59,7 +59,7 @@ jobs:
         python manage.py migrate auth
         python manage.py migrate sessions
         python manage.py migrate admin
-        python manage.py migrate
+        python manage.py migrate --run-syncdb
 
     - name: Run tests
       working-directory: backend
