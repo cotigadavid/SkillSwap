@@ -58,8 +58,9 @@ jobs:
         python manage.py migrate contenttypes
         python manage.py migrate auth
         python manage.py migrate sessions
+        python manage.py migrate api
         python manage.py migrate admin
-        python manage.py migrate --run-syncdb
+        python manage.py migrate
 
     - name: Run tests
       working-directory: backend
