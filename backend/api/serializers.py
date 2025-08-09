@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Skill, CustomUser, Conversation, Message, Review, SkillSwapRequest
+from .models import Skill, CustomUser, Conversation, Message, MessageAttachment, Review, SkillSwapRequest
 from datetime import date
 from .models import CustomUser
 from django.db.models import Avg
@@ -93,13 +93,14 @@ class CustomUserSerializer(serializers.ModelSerializer):
         return data
     
 class SkillSwapRequestSerializer(serializers.ModelSerializer):
+    sender = serializers.PrimaryKeyRelatedField(read_only=True)
     timestamp = serializers.ReadOnlyField()
     offered_skill = serializers.PrimaryKeyRelatedField(many=True, queryset=Skill.objects.all())
     requested_skill = serializers.PrimaryKeyRelatedField(many=True, queryset=Skill.objects.all())
 
     class Meta:
         model = SkillSwapRequest
-        fields = ['sender', 'receiver', 'offered_skills', 'requested_skills', 'status', 'message', 'timestamp']
+        fields = ['sender', 'receiver', 'offered_skill', 'requested_skill', 'status', 'message', 'timestamp']
     
     def create(self, validated_data):
         offered_skills = validated_data.pop('offered_skill')
@@ -108,7 +109,28 @@ class SkillSwapRequestSerializer(serializers.ModelSerializer):
         skill_swap_request.offered_skill.set(offered_skills)
         skill_swap_request.requested_skill.set(requested_skills)
         return skill_swap_request
+
+class SkillRequestListSerializer(serializers.ModelSerializer):
+
+    sender = serializers.SerializerMethodField()
+    receiver = serializers.IntegerField(source='receiver.id', read_only=True)
+    offered_skill = SkillSerializer(many=True, read_only=True)
+    requested_skill = SkillSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = SkillSwapRequest
+        fields = ['id', 'sender', 'receiver', 'offered_skill', 'requested_skill', 'status', 'message', 'timestamp']
     
+    def get_sender(self, obj):
+        sender = obj.sender
+        return {
+            "id": sender.id,
+            "name": f"{sender.last_name} {sender.first_name}",
+            "profile_picture" : (
+                self.context['request'].build_absolute_uri(obj.sender.profile_picture.url)
+                if obj.sender.profile_picture else None
+            ) 
+        }
 
 class ConversationSerializer(serializers.ModelSerializer):
     created_at = serializers.ReadOnlyField()
@@ -121,27 +143,29 @@ class ConversationSerializer(serializers.ModelSerializer):
         if len(value) < 2:
             raise serializers.ValidationError("A conversation must have at least 2 participants.")
         return value
-    
-    def to_representation(self, instance):
-        rep = super().to_representation(instance)
-        rep['participants'] = [user.username for user in instance.participants.all()]
-        return rep
 
+
+class MessageAttachmentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MessageAttachment
+        fields = ['id', 'file', 'uploaded_at']
 
 class MessageSerializer(serializers.ModelSerializer):
+    attachments = MessageAttachmentSerializer(many=True, read_only=True)
     created_at = serializers.ReadOnlyField()
 
     class Meta:
         model = Message
         fields = '__all__'
 
-    def validate(self, data):
-        conversation = data['conversation']
-        sender = data['sender']
-        if sender not in conversation.participants.all():
-            raise serializers.ValidationError("Sender must be a participant in the conversation.")
-        return data
-    
+    def create(self, validated_data):
+        request = self.context.get('request')
+        files = request.FILES.getlist('attachments')
+        message = Message.objects.create(**validated_data)
+        for file in files:
+            MessageAttachment.objects.create(message=message, file=file)
+        return message
+
 
 class RegisterSerializer(serializers.ModelSerializer):
         
@@ -201,10 +225,3 @@ class SkillPublicSerializer(serializers.ModelSerializer):
         average = reviews.aggregate(rating=Avg('stars'))['rating']
 
         return {'count': count, 'rating': average}
-            
-    
-    
-    
-    
-
-    

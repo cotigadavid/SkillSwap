@@ -7,6 +7,7 @@ __pycache__/
 db.sqlite3
 venv/
 .env
+.secrets
 *.log
 
 # Django migrations
@@ -21,3 +22,4 @@ frontend/.env
 # OS-specific
 .DS_Store
 Thumbs.db
+
