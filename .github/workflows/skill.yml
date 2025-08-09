@@ -27,7 +27,7 @@ jobs:
 
     env:
       CI: 'true'
-      SECRET_KEY: 'ci-test-key-not-for-production'  # You can hardcode this for CI
+      SECRET_KEY: 'ci-test-key-not-for-production'
       DEBUG: 'False'
       ALLOWED_HOSTS: 'localhost,127.0.0.1'
 
@@ -55,7 +55,11 @@ jobs:
     - name: Setup database
       working-directory: backend
       run: |
-        python manage.py migrate --run-syncdb
+        python manage.py migrate contenttypes
+        python manage.py migrate auth
+        python manage.py migrate sessions
+        python manage.py migrate admin
+        python manage.py migrate
 
     - name: Run tests
       working-directory: backend
