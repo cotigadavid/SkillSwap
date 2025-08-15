@@ -225,10 +225,3 @@ class SkillPublicSerializer(serializers.ModelSerializer):
         average = reviews.aggregate(rating=Avg('stars'))['rating']
 
         return {'count': count, 'rating': average}
-            
-    
-    
-    
-    
-
-    

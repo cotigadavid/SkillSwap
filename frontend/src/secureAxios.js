@@ -1,12 +1,13 @@
 import axios from 'axios';
 
 const secureAxios = axios.create({
-    baseURL: 'http://localhost:8000/api',
+    baseURL: process.env.REACT_APP_API_BASE_URL,
     withCredentials: true,
     headers: {
         'Content-Type': 'application/json',
     }
 });
+
 
 secureAxios.interceptors.response.use(
     response => response,
@@ -17,7 +18,7 @@ secureAxios.interceptors.response.use(
             originalRequest._retry = true;
 
             try {
-                await axios.post('http://localhost:8000/api/token/refresh/', null, {
+                await axios.post(`${process.env.REACT_APP_API_BASE_URL}/token/refresh/`, null, {
                     withCredentials: true
                 });
 
