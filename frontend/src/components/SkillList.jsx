@@ -1,9 +1,7 @@
 import { useState, useEffect } from "react";
 import SkillAdvertisement from "./SkillAdvertisement";
 import { Link } from 'react-router-dom';
-//import '../styling/SkillList.css';
 import secureAxios from "../secureAxios";
-
 
 function SkillList() {
     const [query, setQuery] = useState('');
@@ -17,7 +15,10 @@ function SkillList() {
     const [page, setPage] = useState(1);
     const [nextPage, setNextPage] = useState(null);
     const [prevPage, setPrevPage] = useState(null);
+    const [totalCount, setTotalCount] = useState(0);
 
+    const pageSize = 20;  // actualizat aici
+    const totalPages = Math.ceil(totalCount / pageSize);
 
     const handleSearch = async () => {
         try {
@@ -25,160 +26,204 @@ function SkillList() {
                 params: { query, page }
             });
 
-            console.log(response.data.results);
-
             setSkills(response.data.results);
             setNextPage(response.data.next !== null);
             setPrevPage(response.data.previous !== null);
+            setTotalCount(response.data.count);
         } catch (error) {
             console.error("Search failed", error);
         }
     };
 
-    
     useEffect(() => {
         handleSearch();
     }, [page]);
-    
+
+    const renderPageButtons = () => {
+        const buttons = [];
+        const startPage = Math.max(1, page - 2);
+        const endPage = Math.min(totalPages, page + 2);
+
+        if (startPage > 1) {
+            buttons.push(
+                <button
+                    key={1}
+                    onClick={() => setPage(1)}
+                    className="px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:text-teal-600 transition-colors"
+                >
+                    1
+                </button>
+            );
+            if (startPage > 2) {
+                buttons.push(
+                    <span key="start-ellipsis" className="px-2 text-gray-500">...</span>
+                );
+            }
+        }
+
+        for (let p = startPage; p <= endPage; p++) {
+            buttons.push(
+                <button
+                    key={p}
+                    onClick={() => setPage(p)}
+                    className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                        p === page ? 'bg-teal-500 text-white' : 'text-gray-700 hover:text-teal-600'
+                    }`}
+                >
+                    {p}
+                </button>
+            );
+        }
+
+        if (endPage < totalPages) {
+            if (endPage < totalPages - 1) {
+                buttons.push(
+                    <span key="end-ellipsis" className="px-2 text-gray-500">...</span>
+                );
+            }
+            buttons.push(
+                <button
+                    key={totalPages}
+                    onClick={() => setPage(totalPages)}
+                    className="px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:text-teal-600 transition-colors"
+                >
+                    {totalPages}
+                </button>
+            );
+        }
+
+        return buttons;
+    };
 
     return (
-    <div className="max-w-4xl mx-auto p-6">
-        <div className="flex flex-col sm:flex-row items-center gap-4 mb-8">
-        <input
-            type="text"
-            placeholder="Search skills..."
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            className="flex-1 px-4 py-3 rounded border border-gray-300 focus:outline-none focus:border-gray-400 bg-white"
-        />
-        <button
-             onClick={() => {
-                setPage(1);  
-                handleSearch(); 
-            }}
-            className="bg-gray-700 hover:bg-gray-800 text-white px-6 py-3 rounded font-medium"
-        >
-            Search
-        </button>
-        <button
-            onClick={() => setShowFilters(!showFilters)}
-            className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded font-medium"
-        >
-            Filter
-        </button>
-        </div>
-
-        {showFilters && (
-        <div className="bg-gray-50 p-6 rounded border border-gray-300 mb-8">
-            <fieldset className="mb-6">
-            <legend className="text-lg font-semibold mb-4 text-gray-800">Filter by difficulty</legend>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                <label className="inline-flex items-center gap-2 cursor-pointer">
-                <input
-                    type="checkbox"
-                    id="Easy"
-                    name="Easy"
-                    checked={easyChecked}
-                    onChange={() => setEasyChecked(!easyChecked)}
-                    className="w-4 h-4 text-gray-600 focus:ring-gray-400"
-                />
-                <span className="text-gray-700">Easy</span>
-                </label>
-                <label className="inline-flex items-center gap-2 cursor-pointer">
-                <input
-                    type="checkbox"
-                    id="Medium"
-                    name="Medium"
-                    checked={mediumChecked}
-                    onChange={() => setMediumChecked(!mediumChecked)}
-                    className="w-4 h-4 text-gray-600 focus:ring-gray-400"
-                />
-                <span className="text-gray-700">Medium</span>
-                </label>
-                <label className="inline-flex items-center gap-2 cursor-pointer">
-                <input
-                    type="checkbox"
-                    id="Hard"
-                    name="Hard"
-                    checked={hardChecked}
-                    onChange={() => setHardChecked(!hardChecked)}
-                    className="w-4 h-4 text-gray-600 focus:ring-gray-400"
-                />
-                <span className="text-gray-700">Hard</span>
-                </label>
-                <label className="inline-flex items-center gap-2 cursor-pointer">
-                <input
-                    type="checkbox"
-                    id="Serious"
-                    name="Serious"
-                    checked={seriousChecked}
-                    onChange={() => setSeriousChecked(!seriousChecked)}
-                    className="w-4 h-4 text-gray-600 focus:ring-gray-400"
-                />
-                <span className="text-gray-700">Serious</span>
-                </label>
-            </div>
-            </fieldset>
-
-            <div>
-            <label className="block font-semibold mb-2 text-gray-800">Minimum rating: {minRating} ⭐</label>
-            <input
-                type="range"
-                min="1"
-                max="5"
-                step="1"
-                value={minRating}
-                onChange={(e) => setMinRating(parseInt(e.target.value))}
-                className="w-full h-2 bg-gray-300 rounded appearance-none cursor-pointer"
-            />
-            </div>
-        </div>
-        )}
-
-        <h2 className="text-2xl font-bold mb-6 text-gray-800">Skill Advertisements</h2>
-        <div className="space-y-4">
-        {skills
-            .filter(item => {
-            const diff = item.difficulty;
-            const rating = item.reviews.rating;
-            return (
-                (rating >= minRating || item.reviews.count === 0) &&
-                (
-                (diff === "easy" && easyChecked) ||
-                (diff === "medium" && mediumChecked) ||
-                (diff === "hard" && hardChecked) ||
-                (diff === "serious" && seriousChecked)
-                )
-            );
-            })
-            .map(item => (
-            <Link key={item.id} to={`/skills/${item.id}`} className="block">
-                <div className="border border-gray-300 rounded p-4 hover:border-gray-400 bg-white">
-                    <SkillAdvertisement skill={item} />
+        <div className="max-w-4xl mx-auto p-6">
+            <div className="bg-white rounded-[6px] p-6 mb-8">
+                <div className="flex flex-col sm:flex-row items-center gap-4 mb-6">
+                    <input
+                        type="text"
+                        placeholder="Search skills..."
+                        value={query}
+                        onChange={(e) => setQuery(e.target.value)}
+                        className="flex-1 px-4 py-3 border border-gray-300 rounded-[6px] focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all duration-200 text-gray-900 placeholder-gray-500"
+                    />
+                    <button
+                        onClick={() => {
+                            setPage(1);
+                            handleSearch();
+                        }}
+                        className="bg-teal-500 hover:bg-teal-600 text-white px-6 py-3 rounded-[6px] font-medium transition-all duration-200"
+                    >
+                        Search
+                    </button>
+                    <button
+                        onClick={() => setShowFilters(!showFilters)}
+                        className="bg-white hover:bg-gray-50 text-teal-500 hover:text-teal-600 border border-teal-500 hover:border-teal-600 px-6 py-3 rounded-[6px] font-medium transition-all duration-200"
+                    >
+                        Filter
+                    </button>
                 </div>
-            </Link>
-            ))}
-        </div>
-            <div className="flex justify-center mt-8 gap-4">
-            <button
-                onClick={() => setPage((p) => Math.max(p - 1, 1))}
-                disabled={!prevPage}
-                className={`px-4 py-2 rounded font-medium ${prevPage ? 'bg-gray-700 text-white hover:bg-gray-800' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}
-            >
-                ← Previous
-            </button>
-            <span className="self-center text-gray-700 font-semibold">Page {page}</span>
-            <button
-                onClick={() => setPage((p) => p + 1)}
-                disabled={!nextPage}
-                className={`px-4 py-2 rounded font-medium ${nextPage ? 'bg-gray-700 text-white hover:bg-gray-800' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}
-            >
-                Next →
-            </button>
-        </div>
-    </div>
-    );
 
-};
+                {showFilters && (
+                    <div className="bg-white p-4 rounded-md border border-gray-200 mb-6">
+                        <fieldset className="mb-4">
+                            <legend className="text-base font-medium mb-3 text-gray-900">Filter by difficulty</legend>
+                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                                {[
+                                    { label: 'Easy', checked: easyChecked, setter: setEasyChecked },
+                                    { label: 'Medium', checked: mediumChecked, setter: setMediumChecked },
+                                    { label: 'Hard', checked: hardChecked, setter: setHardChecked },
+                                    { label: 'Serious', checked: seriousChecked, setter: setSeriousChecked },
+                                ].map(({ label, checked, setter }) => (
+                                    <label
+                                        key={label}
+                                        className="flex items-center gap-2 cursor-pointer text-sm text-gray-800"
+                                    >
+                                        <input
+                                            type="checkbox"
+                                            checked={checked}
+                                            onChange={() => setter(!checked)}
+                                            className="w-4 h-4 accent-teal-500 text-teal-500 border-gray-300 rounded focus:ring-teal-400"
+                                        />
+                                        {label}
+                                    </label>
+                                ))}
+                            </div>
+                        </fieldset>
+
+                        <div className="mt-4">
+                            <label className="block text-sm font-medium mb-2 text-gray-900">
+                                Minimum rating: {minRating} ⭐
+                            </label>
+                            <input
+                                type="range"
+                                min="1"
+                                max="5"
+                                step="1"
+                                value={minRating}
+                                onChange={(e) => setMinRating(parseInt(e.target.value))}
+                                className="w-full h-2 bg-gray-300 rounded appearance-none cursor-pointer accent-teal-500"
+                            />
+                        </div>
+                    </div>
+                )}
+            </div>
+
+            <div className="bg-white rounded-[6px] p-6">
+                <h2 className="text-2xl font-semibold mb-6 text-gray-900">Skill Advertisements</h2>
+                <div className="space-y-4">
+                    {skills
+                        .filter(item => {
+                            const diff = item.difficulty;
+                            const rating = item.reviews.rating;
+                            return (
+                                (rating >= minRating || item.reviews.count === 0) &&
+                                (
+                                    (diff === "easy" && easyChecked) ||
+                                    (diff === "medium" && mediumChecked) ||
+                                    (diff === "hard" && hardChecked) ||
+                                    (diff === "serious" && seriousChecked)
+                                )
+                            );
+                        })
+                        .map(item => (
+                            <Link key={item.id} to={`/skills/${item.id}`} className="block">
+                                <div className="border border-gray-200 rounded-sm p-4 hover:border-gray-400 bg-white transition-colors duration-200">
+                                    <SkillAdvertisement skill={item} />
+                                </div>
+                            </Link>
+                        ))}
+                </div>
+
+                <div className="flex items-center justify-center mt-8 gap-2">
+                    <button
+                        onClick={() => setPage((p) => Math.max(p - 1, 1))}
+                        disabled={!prevPage}
+                        className={`p-2 w-10 h-10 rounded-full font-medium transition-all duration-200 ${
+                            prevPage 
+                                ? 'bg-teal-500 text-white hover:bg-teal-600' 
+                                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                        }`}
+                    >
+                        ←
+                    </button>
+
+                    {renderPageButtons()}
+
+                    <button
+                        onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
+                        disabled={!nextPage}
+                        className={`p-2 w-10 h-10 rounded-full font-medium transition-all duration-200 ${
+                            nextPage 
+                                ? 'bg-teal-500 text-white hover:bg-teal-600' 
+                                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                        }`}
+                    >
+                        →
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+}
 
 export default SkillList;

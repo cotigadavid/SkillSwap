@@ -41,7 +41,7 @@ const Navbar = ({ onNavigate }) => {
                         <div className="flex items-center">
                             <button
                                 onClick={() => handleNavigation('/')}
-                                className="text-2xl font-bold text-blue-600 hover:text-blue-700 transition-colors"
+                                className="text-2xl font-bold text-teal-700 hover:text-teal-800 transition-colors"
                             >
                                 SkillSwap
                             </button>
@@ -50,7 +50,7 @@ const Navbar = ({ onNavigate }) => {
                         <div className="flex items-center space-x-1">
                             <button
                                 onClick={() => handleNavigation('/conv')}
-                                className="flex items-center space-x-2 px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-100 hover:text-blue-600 transition-colors"
+                                className="flex items-center space-x-2 px-4 py-2 rounded-lg text-gray-600 hover:text-gray-900 transition-colors"
                             >
                                 <MessageCircle size={20} />
                                 <span className="hidden sm:block font-medium">Chat</span>
@@ -58,7 +58,7 @@ const Navbar = ({ onNavigate }) => {
 
                             <button
                                 onClick={() => handleNavigation('/requests')}
-                                className="flex items-center space-x-2 px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-100 hover:text-orange-600 transition-colors"
+                                className="flex items-center space-x-2 px-4 py-2 rounded-lg text-gray-600 hover:text-gray-900 transition-colors"
                             >
                                 <FileText size={20} />
                                 <span className="hidden sm:block font-medium">Requests</span>
@@ -66,15 +66,16 @@ const Navbar = ({ onNavigate }) => {
 
                             <button
                                 onClick={() => handleNavigation('/my-profile')}
-                                className="flex items-center space-x-2 px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-100 hover:text-purple-600 transition-colors"
+                                className="flex items-center space-x-2 px-4 py-2 rounded-lg text-gray-600 hover:text-gray-900 transition-colors"
                             >
                                 <User size={20} />
                                 <span className="hidden sm:block font-medium">My Profile</span>
                             </button>
 
+
                             <button
                                 onClick={() => handleNavigation('/auth')}
-                                className="flex items-center space-x-2 px-4 py-2 ml-2 rounded-lg bg-green-600 text-white hover:bg-green-700 transition-colors shadow-sm"
+                                className="flex items-center space-x-2 px-4 py-2 ml-2 rounded-lg bg-teal-600 text-white hover:bg-teal-700 transition-colors shadow-sm"
                             >
                                 <LogIn size={20} />
                                 <span className="font-medium">Log In</span>
@@ -111,7 +112,7 @@ const Navbar = ({ onNavigate }) => {
                         
                         <button
                             onClick={() => handleNavigation('/auth')}
-                            className="flex flex-col items-center py-2 px-3 rounded text-green-600 hover:text-green-700 transition-colors"
+                            className="flex flex-col items-center py-2 px-3 rounded text-teal-600 hover:text-teal-700 transition-colors"
                         >
                             <LogIn size={20} />
                             <span className="text-xs mt-1">Log In</span>

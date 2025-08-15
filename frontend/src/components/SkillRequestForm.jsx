@@ -48,11 +48,12 @@ function SkillRequestForm({ mySkills, onSubmit }) {
                 }`}
               >
                 <input
-                  type="checkbox"
-                  className="w-4 h-4 text-gray-600 focus:ring-gray-400 mr-3"
-                  checked={selectedSkills.includes(skill.id)}
-                  onChange={() => handleSkillToggle(skill.id)}
+                    type="checkbox"
+                    className="w-4 h-4 accent-teal-500 focus:ring-gray-600 mr-3"
+                    checked={selectedSkills.includes(skill.id)}
+                    onChange={() => handleSkillToggle(skill.id)}
                 />
+
                 <span className={`font-medium ${
                   selectedSkills.includes(skill.id) ? 'text-gray-800' : 'text-gray-700'
                 }`}>

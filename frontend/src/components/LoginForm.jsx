@@ -7,17 +7,16 @@ import { Link } from "react-router-dom";
 import secureAxios from "../secureAxios";
 
 const LoginForm = () => {
-
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const navigate = useNavigate();
+    
     const handleSubmit = async (e) => {
         try {
             e.preventDefault();
             console.log('Username:', username);
             console.log('Password:', password);
-
             const response = await fetch('http://localhost:8000/api/token/', {
                 method: 'POST',
                 withCredentials: true,
@@ -29,22 +28,20 @@ const LoginForm = () => {
                     password: password
                 })
             });
-
             const data = await response.json();
-
             console.log(data);
             localStorage.setItem('userId', data["userId"]);
-
             navigate("/");
         } catch (error) {
             console.error("Error logging in: ", error);
             alert("Failed to log in. Please try again.");
         }
     };
+    
     const toggleShowPassword = () => {
         setShowPassword(prev => !prev);
     }
-    
+   
     return (
         <div className="space-y-4">
             <input
@@ -68,13 +65,13 @@ const LoginForm = () => {
             >
                 Log in
             </button>
-            <Link to="/reset-password">
-              <button
-                  type="button"
-                  className="w-full py-3 mt-4 bg-yellow-300 text-lg font-medium rounded-md hover:bg-yellow-400 transition-colors"
-              >
-                  Forgot your password?
-              </button>
+            <Link to="/reset-password" className="block">
+                <button
+                    type="button"
+                    className="w-full bg-white hover:bg-gray-50 text-teal-500 hover:text-teal-600 border border-teal-500 hover:border-teal-600 font-medium py-3 px-4 rounded-lg transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] mt-2"
+                >
+                    Forgot your password?
+                </button>
             </Link>
         </div>
     );
