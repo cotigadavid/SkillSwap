@@ -17,7 +17,7 @@ function SkillList() {
     const [prevPage, setPrevPage] = useState(null);
     const [totalCount, setTotalCount] = useState(0);
 
-    const pageSize = 20;  // actualizat aici
+    const pageSize = 20;  
     const totalPages = Math.ceil(totalCount / pageSize);
 
     const handleSearch = async () => {
@@ -161,7 +161,7 @@ function SkillList() {
                                 step="1"
                                 value={minRating}
                                 onChange={(e) => setMinRating(parseInt(e.target.value))}
-                                className="w-full h-2 bg-gray-300 rounded appearance-none cursor-pointer accent-teal-500"
+                                classNamea="w-full h-2 bg-gray-300 rounded appearance-none cursor-pointer accent-teal-500"
                             />
                         </div>
                     </div>

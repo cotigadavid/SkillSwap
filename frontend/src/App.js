@@ -1,5 +1,5 @@
 import './App.css';
-import { Routes, Route, useNavigate } from 'react-router-dom';
+import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import SkillList from './components/SkillList';
 import UserProfile from './components/UserProfile';
 import AdInfo from './components/AdInfo';
@@ -19,13 +19,17 @@ import ResetPassword from './components/ResetPassword';
 import ChoosePassword from './components/ChoosePassword';
 import NavBar from './components/NavBar';
 
-
 function App() {
   const navigate = useNavigate();
+  const location = useLocation();
+  
+  const shouldHideNavbar = location.pathname === '/auth' || 
+                          location.pathname === '/reset-password' ||
+                          location.pathname.startsWith('/choose-password/');
 
   return (
     <div className='main'>
-      <NavBar onNavigate={navigate} /> 
+      <NavBar onNavigate={navigate} hidden={shouldHideNavbar} />
       <Routes>
         <Route path="/" element={<HomePage/>} />
         <Route path="/skills/:id" element={<AdMain />} />
@@ -42,4 +46,5 @@ function App() {
     </div>
   );
 }
+
 export default App;

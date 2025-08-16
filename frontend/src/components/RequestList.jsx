@@ -92,12 +92,18 @@ function RequestList() {
 
 
     if (loading) {
-        return (
-            <div className="flex justify-center items-center h-64">
-                <div className="text-lg">Loading requests...</div>
+    return (
+            <div className="min-h-screen bg-white py-8 px-4">
+                <div className="max-w-4xl mx-auto">
+                    <div className="bg-white border border-gray-200 rounded-[6px] p-8 flex flex-col items-center justify-center">
+                        <div className="animate-spin rounded-full h-10 w-10 border-t-4 border-teal-500 border-solid mb-4"></div>
+                        <p className="text-center text-gray-600">Loading requests...</p>
+                    </div>
+                </div>
             </div>
         );
     }
+
 
     if (error) {
         return (

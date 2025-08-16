@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import secureAxios from '../secureAxios';
 import AddSkill from './AddSkill';
 import SkillEdit from './SkillEdit';
-//import '../styling/UserEdit.css';
 
 const UserEditCard = ({ user }) => {
     const [skills, setSkills] = useState(user.skills || []);
@@ -53,57 +52,57 @@ const UserEditCard = ({ user }) => {
     };
 
     return (
-        <div className="bg-white border border-gray-300 rounded p-6 shadow-sm">
-            <p className="text-xl font-semibold mb-6 text-gray-800">Edit your information</p>
-            <form onSubmit={handleSave} className="space-y-4">
+        <div className="bg-white border border-gray-200 rounded-[6px] p-6">
+            <h2 className="text-xl font-semibold mb-6 text-gray-900">Edit your information</h2>
+            <form onSubmit={handleSave} className="space-y-6">
                 <div>
-                    <label className="block mb-2 font-medium text-gray-700">Phone Number</label>
+                    <label className="block mb-2 font-medium text-gray-900">Phone Number</label>
                     <input
                         type="text"
                         value={phoneNumber}
                         onChange={(e) => setPhoneNumber(e.target.value)}
                         required
-                        className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-gray-400"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-[6px] focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all duration-200 text-gray-900"
                     />
                 </div>
                 <div>
-                    <label className="block mb-2 font-medium text-gray-700">Birthdate</label>
+                    <label className="block mb-2 font-medium text-gray-900">Birthdate</label>
                     <input
                         type="date"
                         value={birthDate}
                         onChange={(e) => setBirthDate(e.target.value)}
                         required
-                        className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-gray-400"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-[6px] focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all duration-200 text-gray-900"
                     />
                 </div>
                 <div>
-                    <label className="block mb-2 font-medium text-gray-700">Home City</label>
+                    <label className="block mb-2 font-medium text-gray-900">Home City</label>
                     <input
                         type="text"
                         value={residingCity}
                         onChange={(e) => setResidingCity(e.target.value)}
                         required
-                        className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-gray-400"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-[6px] focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all duration-200 text-gray-900"
                     />
                 </div>
                 <div>
-                    <label className="block mb-2 font-medium text-gray-700">Home County</label>
+                    <label className="block mb-2 font-medium text-gray-900">Home County</label>
                     <input
                         type="text"
                         value={residingCounty}
                         onChange={(e) => setResidingCounty(e.target.value)}
                         required
-                        className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-gray-400"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-[6px] focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all duration-200 text-gray-900"
                     />
                 </div>
 
-                <div className="mt-6">
-                    <h3 className="text-lg font-semibold mb-4 text-gray-800">Skills</h3>
+                <div className="mt-8">
+                    <h3 className="text-lg font-semibold mb-4 text-gray-900">Skills</h3>
                     <div className="space-y-3">
                         {skills.map(skill => (
                             <div
                                 key={skill.id}
-                                className="flex items-center justify-between p-3 bg-gray-50 border border-gray-300 rounded"
+                                className="flex items-center justify-between p-4 border border-gray-200 rounded-[6px] hover:border-gray-400 transition-all duration-200"
                             >
                                 <div className="flex items-center gap-3">
                                     <img 
@@ -111,10 +110,10 @@ const UserEditCard = ({ user }) => {
                                         width="40" 
                                         height="40" 
                                         alt="Skill" 
-                                        className="rounded border border-gray-300"
+                                        className="rounded-[6px] border border-gray-200"
                                     />
                                     <div>
-                                        <p className="font-medium text-gray-800">{skill.title}</p>
+                                        <p className="font-medium text-gray-900">{skill.title}</p>
                                         <p className="text-sm text-gray-500">Difficulty: {skill.difficulty}</p>
                                     </div>
                                 </div>
@@ -122,21 +121,21 @@ const UserEditCard = ({ user }) => {
                                     <button
                                         type="button"
                                         onClick={() => handleDeleteSkill(skill.id)}
-                                        className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 text-sm"
+                                        className="px-4 py-2 bg-white hover:bg-gray-50 text-gray-700 hover:text-gray-900 border border-gray-300 hover:border-gray-400 rounded-[6px] font-medium transition-all duration-200 text-sm"
                                     >
                                         Delete
                                     </button>
                                     <button
                                         type="button"
                                         onClick={() => setEditingSkillId(skill.id)}
-                                        className="px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600 text-sm"
+                                        className="px-4 py-2 bg-teal-500 hover:bg-teal-600 text-white rounded-[6px] font-medium transition-all duration-200 text-sm"
                                     >
                                         Edit
                                     </button>
                                 </div>
                                 {editingSkillId === skill.id && (
                                     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                                        <div className="bg-white border border-gray-300 rounded p-6 shadow-sm max-w-md w-full mx-4">
+                                        <div className="bg-white border border-gray-200 rounded-[6px] p-6 max-w-md w-full mx-4">
                                             <SkillEdit skill={skill} onClose={() => setEditingSkillId(null)} />
                                         </div>
                                     </div>
@@ -146,24 +145,24 @@ const UserEditCard = ({ user }) => {
                     </div>
                 </div>
 
-                <div className="flex justify-end gap-4 mt-8 pt-4 border-t border-gray-300">
-                    <button 
-                        type="submit" 
-                        className="px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-800"
-                    >
-                        Save
-                    </button>
+                <div className="flex justify-end gap-4 mt-8 pt-6 border-t border-gray-200">
                     <button
                         type="button"
                         onClick={handleDiscard}
-                        className="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500"
+                        className="px-6 py-3 bg-white hover:bg-gray-50 text-gray-700 hover:text-gray-900 border border-gray-300 hover:border-gray-400 rounded-[6px] font-medium transition-all duration-200"
                     >
                         Discard
+                    </button>
+                    <button 
+                        type="submit" 
+                        className="px-6 py-3 bg-teal-500 hover:bg-teal-600 text-white rounded-[6px] font-medium transition-all duration-200"
+                    >
+                        Save
                     </button>
                 </div>
             </form>
             
-            <div className="mt-6 pt-6 border-t border-gray-300">
+            <div className="mt-8 pt-6 border-t border-gray-200">
                 <AddSkill />
             </div>
         </div>

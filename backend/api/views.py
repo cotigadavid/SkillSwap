@@ -37,7 +37,7 @@ class SkillViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         return Skill.objects.filter(user=self.request.user).select_related('user')
 
-    def get_serializer_context(self):
+    def get_serializer_acontext(self):
         return {'request': self.request}
     
 class SkillPublicViewSet(viewsets.ReadOnlyModelViewSet):
@@ -352,7 +352,7 @@ class CookieTokenObtainPairView(TokenObtainPairView):
             response.set_cookie(
                 key='access_token',
                 value=access,
-                max_age=5 * 60,  # 5 minutes
+                max_age=5 * 60,  
                 httponly=True,
                 secure=True,  
                 samesite='Lax',
@@ -362,7 +362,7 @@ class CookieTokenObtainPairView(TokenObtainPairView):
             response.set_cookie(
                 key='refresh_token',
                 value=refresh,
-                max_age=7 * 24 * 60 * 60,  # 7 days
+                max_age=7 * 24 * 60 * 60,  
                 httponly=True,
                 secure=True,
                 samesite='Lax',
@@ -398,9 +398,19 @@ class CookieTokenRefreshView(TokenRefreshView):
             value=access_token,
             max_age=cookie_max_age,
             httponly=True,
-            secure=False,  # use False in local dev if not on HTTPS
+            secure=False, 
             samesite='Lax',
             path='/'
         )
 
         return response
+    
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def logout_view(request):
+    response = Response({'message': 'Logged out successfully'}, status=200)
+    
+    response.delete_cookie('access_token', path='/')
+    response.delete_cookie('refresh_token', path='/api/token/refresh/')
+    
+    return response

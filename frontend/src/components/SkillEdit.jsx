@@ -1,113 +1,243 @@
 import { useState } from "react";
 import secureAxios from "../secureAxios";
 
-const SkillEdit = ( {skill, onClose} ) => {
+const SkillEdit = ({ skill, onClose }) => {
     const [title, setTitle] = useState(skill.title);
     const [difficulty, setDifficulty] = useState(skill.difficulty);
     const [hours, setHours] = useState(skill.hours_needed);
     const [description, setDescription] = useState(skill.description);
-    const [picture, setPicture] = useState(skill.picture);
-    
-    const handleSave = async () => {
-        try {
-            const formData = new FormData();
-            formData.append('title', title);
-            formData.append('difficulty', difficulty);
-            formData.append('hours_needed', hours);
-            formData.append('description', description);
-            if (picture)
-                formData.append('skill_picture', picture);
+    const [picture, setPicture] = useState(null);
+    const [isLoading, setIsLoading] = useState(false);
 
-            await secureAxios.patch(`http://localhost:8000/api/skills/${skill.id}/`, {
-                body: formData,
-            })
+    const handleSave = async (e) => {
+        e.preventDefault();
+        setIsLoading(true);
+
+        try {
+            console.log('=== STARTING SAVE PROCESS ===');
+            console.log('Skill ID:', skill.id);
+            console.log('Picture selected:', !!picture);
+
+            const textData = {
+                title: title,
+                difficulty: difficulty,
+                hours_needed: parseInt(hours),
+                description: description
+            };
+
+            console.log('Sending text data:', textData);
+
+            const response = await secureAxios.patch(
+                `skills/${skill.id}/`,
+                textData,
+                {
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                }
+            );
+
+            console.log('✅ Text data updated successfully');
+
+            if (picture) {
+                console.log('=== UPLOADING IMAGE ===');
+                
+                const imageFormData = new FormData();
+                imageFormData.append('skill_picture', picture);
+
+                console.log('FormData created with skill_picture field');
+
+                const imageResponse = await secureAxios.patch(
+                    `skills/${skill.id}/`,
+                    imageFormData
+                );
+
+                console.log('✅ Image updated successfully:', imageResponse.data);
+            }
+
+            console.log('=== SAVE COMPLETED ===');
+            alert('Skill updated successfully!');
+            onClose();
+            window.location.reload();
+
         } catch (error) {
-            console.error("Error fetching skill info: ", error);
+            console.error("❌ ERROR:", error);
+            
+            if (error.response) {
+                console.error("Error status:", error.response.status);
+                console.error("Error data:", error.response.data);
+
+                const errorMessage = error.response.data?.detail || 
+                                   error.response.data?.message ||
+                                   JSON.stringify(error.response.data);
+                alert(`Error: ${errorMessage}`);
+            } else {
+                console.error("Network/other error:", error.message);
+                alert(`Error: ${error.message}`);
+            }
+        } finally {
+            setIsLoading(false);
         }
     };
 
     const handlePictureChange = (e) => {
-        setPicture(e.target.files[0]);
+        const file = e.target.files[0];
+        if (file) {
+            console.log('File selected:', file);
+            
+            const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+            if (validTypes.includes(file.type)) {
+               
+                const maxSize = 5 * 1024 * 1024; //
+                if (file.size > maxSize) {
+                    alert("File size too large. Please select an image smaller than 5MB.");
+                    e.target.value = '';
+                    return;
+                }
+                
+                setPicture(file);
+                console.log('Picture state updated'); 
+            } else {
+                alert("Please select a valid image file (JPEG, PNG, or GIF)");
+                e.target.value = '';
+            }
+        }
     };
 
     return (
-        <div className="w-full">
-            <h2 className="text-xl font-semibold mb-6 text-gray-800">Edit Skill</h2>
-            <form onSubmit={handleSave} className="space-y-4">
-                <div>
-                    <label className="block mb-2 font-medium text-gray-700">Title</label>
-                    <input
-                        type="text"
-                        value={title}
-                        onChange={(e) => setTitle(e.target.value)}
-                        required
-                        className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:border-gray-400"
-                    />
-                </div>
-                <div>
-                    <label className="block mb-2 font-medium text-gray-700">Difficulty</label>
-                    <input
-                        type="text"
-                        value={difficulty}
-                        onChange={(e) => setDifficulty(e.target.value)}
-                        required
-                        className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:border-gray-400"
-                    />
-                </div>
-                <div>
-                    <label className="block mb-2 font-medium text-gray-700">Hours needed</label>
-                    <input
-                        type="number"
-                        value={hours}
-                        onChange={(e) => setHours(e.target.value)}
-                        required
-                        className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:border-gray-400"
-                    />
-                </div>
-                <div>
-                    <label className="block mb-2 font-medium text-gray-700">Description</label>
-                    <textarea
-                        value={description}
-                        onChange={(e) => setDescription(e.target.value)}
-                        required
-                        rows="3"
-                        className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:border-gray-400 resize-none"
-                    />
-                </div>
-                <div>
-                    <label className="block mb-2 font-medium text-gray-700">Skill Image</label>
-                    <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handlePictureChange}
-                        className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:border file:border-gray-300 file:rounded file:text-sm file:font-medium file:bg-gray-50 file:text-gray-700 hover:file:bg-gray-100"
-                    />
-                    {skill.image && (
-                        <img
-                            src={`http://localhost:8000${skill.image}`}
-                            alt="Current"
-                            width="100"
-                            className="mt-3 rounded border border-gray-300"
+        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+            <div className="bg-white rounded-[6px] w-full max-w-lg p-6 overflow-y-auto max-h-[90vh] shadow-lg">
+                <h2 className="text-xl font-semibold mb-6 text-gray-900">Edit Skill</h2>
+                <form onSubmit={handleSave} className="space-y-6">
+                    <div>
+                        <label className="block mb-2 font-medium text-gray-900">Title</label>
+                        <input
+                            type="text"
+                            value={title}
+                            onChange={(e) => setTitle(e.target.value)}
+                            required
+                            className="w-full px-4 py-3 border border-gray-300 rounded-[6px] focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all duration-200 text-gray-900"
                         />
+                    </div>
+
+                    <div>
+                        <label className="block mb-2 font-medium text-gray-900">Difficulty</label>
+                        <select
+                            value={difficulty}
+                            onChange={(e) => setDifficulty(e.target.value)}
+                            required
+                            className="w-full px-4 py-3 border border-gray-300 rounded-[6px] focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all duration-200 text-gray-900"
+                        >
+                            <option value="">Select difficulty</option>
+                            <option value="easy">Easy</option>
+                            <option value="medium">Medium</option>
+                            <option value="hard">Hard</option>
+                            <option value="serious">Serious</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label className="block mb-2 font-medium text-gray-900">Hours needed</label>
+                        <input
+                            type="number"
+                            value={hours}
+                            onChange={(e) => setHours(e.target.value)}
+                            required
+                            min="1"
+                            className="w-full px-4 py-3 border border-gray-300 rounded-[6px] focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all duration-200 text-gray-900"
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block mb-2 font-medium text-gray-900">Description</label>
+                        <textarea
+                            value={description}
+                            onChange={(e) => setDescription(e.target.value)}
+                            required
+                            rows="4"
+                            className="w-full px-4 py-3 border border-gray-300 rounded-[6px] focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all duration-200 text-gray-900 resize-none"
+                            placeholder="Describe your skill..."
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block mb-2 font-medium text-gray-900">Skill Image</label>
+                        <input
+                            type="file"
+                            accept="image/jpeg,image/jpg,image/png,image/gif"
+                            onChange={handlePictureChange}
+                            className="block w-full text-sm text-gray-500 file:mr-4 file:py-3 file:px-4 file:border file:border-gray-300 file:rounded-[6px] file:text-sm file:font-medium file:bg-white file:text-gray-700 hover:file:bg-gray-50 transition-all duration-200"
+                        />
+
+                        {skill.skill_picture && !picture && (
+                            <div className="mt-4">
+                                <p className="text-sm text-gray-600 mb-2">Current image:</p>
+                                <img
+                                    src={skill.skill_picture}
+                                    alt="Current skill"
+                                    className="w-24 h-24 object-cover rounded-[6px] border border-gray-200"
+                                />
+                            </div>
+                        )}
+
+                        {picture && (
+                            <div className="mt-4">
+                                <p className="text-sm text-gray-600 mb-2">New image selected:</p>
+                                <div className="flex items-center gap-3">
+                                    <p className="text-sm text-teal-600">{picture.name}</p>
+                                    <p className="text-xs text-gray-500">
+                                        ({(picture.size / 1024).toFixed(1)} KB)
+                                    </p>
+                                </div>
+                                <img
+                                    src={URL.createObjectURL(picture)}
+                                    alt="New skill preview"
+                                    className="w-24 h-24 object-cover rounded-[6px] border border-gray-200 mt-2"
+                                />
+                            </div>
+                        )}
+                    </div>
+
+                    {process.env.NODE_ENV === 'development' && (
+                        <div className="text-xs text-gray-500 border p-2 rounded">
+                            <p>Debug: Picture selected: {picture ? 'Yes' : 'No'}</p>
+                            <p>Debug: Picture name: {picture?.name || 'None'}</p>
+                            <p>Debug: Picture size: {picture?.size || 'N/A'}</p>
+                            <p>Debug: Skill ID: {skill.id}</p>
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    console.log('=== DEBUG INFO ===');
+                                    console.log('Current skill:', skill);
+                                    console.log('Form state:', { title, difficulty, hours, description });
+                                    console.log('Selected picture:', picture);
+                                }}
+                                className="mt-2 px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs"
+                            >
+                                Log Debug Info
+                            </button>
+                        </div>
                     )}
-                </div>
-                <div className="flex gap-3 pt-4">
-                    <button
-                        type="submit"
-                        onClick={handleSave}
-                        className="flex-1 px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-800"
-                    >
-                        Save
-                    </button>
-                    <button
-                        type="button"
-                        onClick={onClose}
-                        className="flex-1 px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500"
-                    >
-                        Close
-                    </button>
-                </div>
-            </form>
+
+                    <div className="flex gap-3 pt-6 border-t border-gray-200">
+                        <button
+                            type="button"
+                            onClick={onClose}
+                            disabled={isLoading}
+                            className="flex-1 px-6 py-3 bg-white hover:bg-gray-50 text-gray-700 hover:text-gray-900 border border-gray-300 hover:border-gray-400 rounded-[6px] font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            type="submit"
+                            disabled={isLoading}
+                            className="flex-1 px-6 py-3 bg-teal-500 hover:bg-teal-600 text-white rounded-[6px] font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            {isLoading ? 'Saving...' : 'Save Changes'}
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     );
 };

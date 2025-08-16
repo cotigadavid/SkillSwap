@@ -17,6 +17,7 @@ urlpatterns = [
     path('token/', CookieTokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', CookieTokenRefreshView.as_view(), name='token_refresh'),
     path('register/', RegisterView.as_view(), name="register"),
+    path('logout/', logout_view, name='logout'),
     path('mark-read/', MarkConversationAsRead, name="mark-read"),
     path('mark-received/', MarkConversationAsReceived, name="mark-received"),
     path('skills_search/', search_skills, name="skills-search"),
