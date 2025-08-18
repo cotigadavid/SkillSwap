@@ -72,7 +72,7 @@ function SkillRequestForm({ mySkills, onSubmit }) {
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             placeholder="Tell them why you're interested in this skill exchange..."
-            className="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-gray-400 resize-none"
+            className="w-full px-4 py-3 border border-gray-300 rounded-[6px] focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all duration-200 resize-none text-gray-900 placeholder-gray-500"
             rows="4"
           />
         </div>
@@ -84,7 +84,7 @@ function SkillRequestForm({ mySkills, onSubmit }) {
           className={`w-full py-3 px-6 rounded font-semibold text-white ${
             selectedSkills.length === 0 || isSubmitting
               ? 'bg-gray-400 cursor-not-allowed'
-              : 'bg-gray-700 hover:bg-gray-800'
+              : 'bg-teal-500 hover:bg-teal-600 transition-all duration-200'
           }`}
         >
           {isSubmitting ? (

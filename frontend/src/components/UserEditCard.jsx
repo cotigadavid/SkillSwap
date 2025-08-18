@@ -34,8 +34,14 @@ const UserEditCard = ({ user }) => {
     const navigate = useNavigate();
 
     const handleDiscard = () => {
-        navigate(-1);
-    };  
+        setPhoneNumber(user.phone_number || "");
+        setBirthDate(user.birth_date || "");
+        setResidingCity(user.residing_city || "");
+        setResidingCounty(user.residing_county || "");
+        setSkills(user.skills || []);
+        setEditingSkillId(null);
+    };
+ 
 
     const handleDeleteSkill = async (skillId) => {
         try {

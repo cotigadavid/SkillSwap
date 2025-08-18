@@ -29,7 +29,7 @@ function AdInfo({ ad }) {
           <h3 className="text-2xl font-bold text-gray-800 mb-1">{ad.user.name}</h3>
           <h4 className="text-lg font-semibold text-gray-600 mb-2">{ad.title}</h4>
          
-          <div className="flex items-center gap-2 mb-2">
+          {/*<div className="flex items-center gap-2 mb-2">
             <div className="flex items-center gap-1">
               {[...Array(5)].map((_, i) => (
                 <svg key={i} className="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20">
@@ -38,7 +38,7 @@ function AdInfo({ ad }) {
               ))}
             </div>
             <span className="text-gray-500 text-sm">(4.8) • 23 reviews</span>
-          </div>
+          </div>*/}
          
           <div className="flex items-center gap-2 text-gray-500">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
