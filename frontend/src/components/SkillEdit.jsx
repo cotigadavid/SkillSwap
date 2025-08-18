@@ -10,6 +10,8 @@ const SkillEdit = ( {skill, onClose} ) => {
     
     const handleSave = async () => {
         try {
+            console.log("-----------");
+            console.log(description);
             const formData = new FormData();
             formData.append('title', title);
             formData.append('difficulty', difficulty);
@@ -18,9 +20,14 @@ const SkillEdit = ( {skill, onClose} ) => {
             if (picture)
                 formData.append('skill_picture', picture);
 
-            await secureAxios.patch(`http://localhost:8000/api/skills/${skill.id}/`, {
+            const response = await secureAxios.patch(`skills/${skill.id}/`, {
                 body: formData,
-            })
+                headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                })
+
+            console.log(response);
         } catch (error) {
             console.error("Error fetching skill info: ", error);
         }
@@ -84,7 +91,7 @@ const SkillEdit = ( {skill, onClose} ) => {
                     />
                     {skill.image && (
                         <img
-                            src={`http://localhost:8000${skill.image}`}
+                            src={`${process.env.REACT_APP_API_BASE_URL}${skill.image}`}
                             alt="Current"
                             width="100"
                             className="mt-3 rounded border border-gray-300"

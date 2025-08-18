@@ -16,8 +16,12 @@ const AddProfilePicture = ( {closeFunction} ) => {
             const formData = new FormData();
             formData.append('profile_picture', file);
             const response = await secureAxios.patch(`users/${userId}/`, {
-                body: formData
+                body: formData,
+                headers: {
+                        'Content-Type': 'multipart/form-data',
+                },
             });
+
             console.log(response);
             if (response.ok) {
                 alert('Profile picture updated!');

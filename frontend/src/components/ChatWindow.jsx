@@ -218,7 +218,7 @@ const ChatWindow = () => {
                             <ul className="mt-2 space-y-1">
                                 {mess.attachments.map((att) => (
                                     <li key={att.id} className="flex justify-between items-center">
-                                        <span className="truncate">{att.file}</span>
+                                        <span className="truncate">{att.filename}</span>
                                         <button
                                             onClick={() => handleDownload(att.file, att.file)}
                                             className="text-blue-600 hover:underline text-sm"

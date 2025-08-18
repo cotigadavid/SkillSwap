@@ -16,17 +16,16 @@ const UserEditCard = ({ user }) => {
     const handleSave = async () => {
         try {
             const userId = localStorage.getItem('userId');
-            await secureAxios.patch(`http://localhost:8000/api/users/${userId}/`, {
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    phone_number: phoneNumber,
-                    birth_date: birthDate,
-                    residing_city: residingCity,
-                    residing_county: residingCounty
-                })
-            })
+
+            const formData = new FormData();
+            formData.append('phone_number', phoneNumber);
+            formData.append('birth_date', birthDate);
+            formData.append('residing_city', residingCity);
+            formData.append('residing_county', residingCounty);
+
+            await secureAxios.patch(`users/${userId}/`, {
+                body: formData,
+            });
         } catch (error) {
             console.error("Error fetching users: ", error);
         }

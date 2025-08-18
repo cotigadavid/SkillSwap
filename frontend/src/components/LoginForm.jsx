@@ -18,9 +18,10 @@ const LoginForm = () => {
             console.log('Username:', username);
             console.log('Password:', password);
 
-            const response = await fetch('http://localhost:8000/api/token/', {
+            const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}token/`, {
                 method: 'POST',
                 withCredentials: true,
+                credentials: 'include',
                 headers: {
                     'Content-Type': 'application/json'
                 },

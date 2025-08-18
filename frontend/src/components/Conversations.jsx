@@ -11,7 +11,7 @@ const Conversations = () => {
     useEffect(() =>  {
         const fetchConversations = async () => {
             try {
-                const response = await secureAxios.get(`http://localhost:8000/api/conversations/`);
+                const response = await secureAxios.get(`${process.env.REACT_APP_API_BASE_URL}conversations/`);
                 const data = response.data;
                 const filtered = data.results.filter(convo => 
                     convo.sender && convo.sender === (parseInt(userId))

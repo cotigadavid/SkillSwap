@@ -11,7 +11,7 @@ const OtherProfile = () => {
     useEffect(() =>  {
             const fetchUser = async () => {
                 try {
-                    const response = await secureAxios.get(`http://localhost:8000/api/users/${userId}/`);
+                    const response = await secureAxios.get(`users/${userId}/`);
                     const data = response.data;
                     console.log(data);
                     setUser(data);
@@ -29,7 +29,7 @@ const OtherProfile = () => {
         src={user.profile_picture}
         alt="Profile"
         width={100}
-        height={100}
+        heig={100}
         className="rounded-full object-cover"
         />
         <UserInformationCard user={user} />

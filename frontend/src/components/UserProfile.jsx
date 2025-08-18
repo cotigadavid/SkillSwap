@@ -15,7 +15,7 @@ const UserProfile = () => {
     useEffect(() =>  {
         const fetchUser = async () => {
             try {
-                const response = await secureAxios.get(`http://localhost:8000/api/users/${userId}/`);
+                const response = await secureAxios.get(`users/${userId}/`);
                 const data = response.data;
                 console.log(data);
                 setUser(data);

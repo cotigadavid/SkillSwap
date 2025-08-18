@@ -4,7 +4,7 @@ const ResetPassword = () => {
     const [email, setEmail] = useState('');
 
     const handleSubmit = async () => {
-        const response = await fetch('http://localhost:8000/api/reset-password/', {
+        const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}reset-password/`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

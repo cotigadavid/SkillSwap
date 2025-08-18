@@ -3,8 +3,12 @@ from .models import Skill, CustomUser, Conversation, Message, MessageAttachment,
 from datetime import date
 from .models import CustomUser
 from django.db.models import Avg
+from decouple import config
 
 class SkillSerializer(serializers.ModelSerializer):
+    user = serializers.SerializerMethodField()
+    reviews = serializers.SerializerMethodField()
+    
     class Meta:
         model = Skill
         fields = '__all__'
@@ -45,6 +49,22 @@ class SkillSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError('Serious skills should require more than 100 hours of practice')
 
         return data
+    
+    def get_user(self, obj):
+        user = obj.user
+        return {
+            'id': user.id,
+            'name': f"{user.last_name} {user.first_name}",
+            'profile': config("BACKEND_URL") + user.profile_picture.url if user.profile_picture else None,
+            'location': f"{user.residing_city}, {user.residing_county}",
+        }
+    
+    def get_reviews(self, obj):
+        reviews = obj.reviews.all()
+        count = reviews.count()
+        average = reviews.aggregate(rating=Avg('stars'))['rating']
+
+        return {'count': count, 'rating': average}
     
 
 class CustomUserSerializer(serializers.ModelSerializer):
@@ -148,7 +168,7 @@ class ConversationSerializer(serializers.ModelSerializer):
 class MessageAttachmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = MessageAttachment
-        fields = ['id', 'file', 'uploaded_at']
+        fields = '__all__'
 
 class MessageSerializer(serializers.ModelSerializer):
     attachments = MessageAttachmentSerializer(many=True, read_only=True)
@@ -163,7 +183,8 @@ class MessageSerializer(serializers.ModelSerializer):
         files = request.FILES.getlist('attachments')
         message = Message.objects.create(**validated_data)
         for file in files:
-            MessageAttachment.objects.create(message=message, file=file)
+            filename = file
+            MessageAttachment.objects.create(message=message, file=file, filename=filename)
         return message
 
 
@@ -201,27 +222,3 @@ class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
         fields = '__all__'
-
-class SkillPublicSerializer(serializers.ModelSerializer):
-    user = serializers.SerializerMethodField()
-    reviews = serializers.SerializerMethodField()
-
-    class Meta:
-        model = Skill
-        fields = ['id', 'title', 'difficulty', 'user', 'description', 'skill_picture', 'reviews']
-    
-    def get_user(self, obj):
-        user = obj.user
-        return {
-            'id': user.id,
-            'name': f"{user.last_name} {user.first_name}",
-            'profile': 'http://localhost:8000' + user.profile_picture.url if user.profile_picture else None,
-            'location': f"{user.residing_city}, {user.residing_county}",
-        }
-    
-    def get_reviews(self, obj):
-        reviews = obj.reviews.all()
-        count = reviews.count()
-        average = reviews.aggregate(rating=Avg('stars'))['rating']
-
-        return {'count': count, 'rating': average}

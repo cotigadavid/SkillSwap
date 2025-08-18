@@ -31,8 +31,8 @@ ALLOWED_HOSTS = config('ALLOWED_HOSTS', '').split(',')
 MEDIA_URL = '/media/'        # URL prefix to access media files
 MEDIA_ROOT = BASE_DIR / 'media'  # The folder where files will be stored
 
-FRONTEND_URL = "http://localhost:3000" 
-BACKEND_URL = "http://localhost:8000"
+FRONTEND_URL = config('FRONTEND_URL') 
+BACKEND_URL = config('BACKEND_URL')
 # Application definition
 
 INSTALLED_APPS = [
@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_extensions',
     'rest_framework',
     'rest_framework_simplejwt',
     'corsheaders',
@@ -75,14 +76,10 @@ SIMPLE_JWT = {
 CORS_ALLOW_CREDENTIALS = True
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
-    "https://skillswap-frontend-gn9c.onrender.com",
-
+    FRONTEND_URL
 ]
 
 AUTH_USER_MODEL = "api.CustomUser"
-
-CORS_ALLOW_ALL_ORIGINS = True 
 
 ROOT_URLCONF = 'backend.urls'
 
@@ -131,8 +128,8 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'test.tweb.node@gmail.com'
-EMAIL_HOST_PASSWORD = 'xdqswyrleddghrgm' # Use an app password, not your Gmail login
+EMAIL_HOST_USER = config("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = config("EMAIL_PASSWORD").strip('"')
 
 
 # Password validation

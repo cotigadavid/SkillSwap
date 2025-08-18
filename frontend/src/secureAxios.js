@@ -18,7 +18,7 @@ secureAxios.interceptors.response.use(
             originalRequest._retry = true;
 
             try {
-                await axios.post(`${process.env.REACT_APP_API_BASE_URL}/token/refresh/`, null, {
+                await axios.post(`${process.env.REACT_APP_API_BASE_URL}token/refresh/`, null, {
                     withCredentials: true
                 });
 
