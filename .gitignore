@@ -9,6 +9,7 @@ venv/
 .env
 .secrets
 *.log
+*.pem
 
 # Django migrations
 **/migrations/*.py
@@ -18,6 +19,7 @@ venv/
 /frontend/node_modules/
 frontend/build/
 frontend/.env
+frontend/.env.development
 
 # OS-specific
 .DS_Store

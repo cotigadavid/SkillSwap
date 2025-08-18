@@ -8,7 +8,7 @@ const ResetPassword = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await fetch('http://localhost:8000/api/reset-password/', {
+            const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}reset-password/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

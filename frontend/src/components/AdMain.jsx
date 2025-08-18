@@ -16,7 +16,7 @@ function AdMain() {
         const fetchData = async () => {
             try {
                 const [adResponse, skillsResponse] = await Promise.all([
-                    secureAxios.get(`/skills-public/${id}/`),
+                    secureAxios.get(`/skills/${id}/`),
                     secureAxios.get('/skills/')
                 ]);
 

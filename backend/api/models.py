@@ -17,7 +17,7 @@ class CustomUserManager(BaseUserManager):
         return user
 
 class CustomUser(AbstractUser):
-    profile_picture = models.ImageField(upload_to='profile_pictures/', storage=OverwriteStorage(), blank=True, null=True)
+    profile_picture = models.ImageField(upload_to='profile_pictures/', storage=OverwriteStorage(), blank=True, null=True, default='profile_pictures/grey.png')
     phone_number = models.CharField(max_length=10)
     birth_date = models.DateField(blank=True, null=True)
     residing_city = models.CharField(max_length=50, blank=True, null=True)
@@ -38,7 +38,7 @@ class CustomUser(AbstractUser):
 
 class Skill(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="skills", null=True, blank=True)
-    skill_picture = models.ImageField(upload_to='skill_pictures/', blank=True, null=True)
+    skill_picture = models.ImageField(upload_to='skill_pictures/', blank=True, null=True, default='skill_pictures/default.jpg')
     title = models.CharField(max_length=20)
     description = models.TextField(null=True, blank=True)
     difficulty = models.CharField(max_length=20, choices=[('easy', 'easy'), ('medium', 'medium'), ('hard', 'hard'), ('serious', 'serious')])
@@ -86,6 +86,7 @@ class Message(models.Model):
 class MessageAttachment(models.Model):
     message = models.ForeignKey(Message, on_delete=models.CASCADE, related_name="attachments")
     file = models.FileField(upload_to='messages/', storage=OverwriteStorage())
+    filename = models.CharField(max_length=100, default='file')
     uploaded_at = models.DateTimeField(auto_now_add=True)
 
 class Review(models.Model):

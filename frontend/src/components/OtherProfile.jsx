@@ -10,7 +10,7 @@ const OtherProfile = () => {
     useEffect(() => {
         const fetchUser = async () => {
             try {
-                const response = await secureAxios.get(`http://localhost:8000/api/users/${userId}/`);
+                const response = await secureAxios.get(`users/${userId}/`);
                 setUser(response.data);
             } catch (error) {
                 console.error("Error fetching user: ", error);
@@ -39,6 +39,7 @@ const OtherProfile = () => {
             />
             <UserInformationCard user={user} isOwnProfile={false} />
         </div>
+
     );
 };
 

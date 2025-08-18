@@ -1,8 +1,3 @@
-import React from "react";
-import star from '../assets/star.png';
-import { useParams } from "react-router-dom";
-import { useState, useEffect } from 'react';
-import secureAxios from "../secureAxios";
 
 function AdInfo({ ad }) {
   if (!ad) {

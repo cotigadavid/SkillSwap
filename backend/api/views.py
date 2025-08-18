@@ -1,6 +1,6 @@
 from django.shortcuts import render
 
-from .serializers import SkillSerializer, CustomUserSerializer, ConversationSerializer, MessageSerializer, RegisterSerializer, ReviewSerializer, SkillPublicSerializer, SkillSwapRequestSerializer, SkillRequestListSerializer
+from .serializers import SkillSerializer, CustomUserSerializer, ConversationSerializer, MessageSerializer, RegisterSerializer, ReviewSerializer, SkillSwapRequestSerializer, SkillRequestListSerializer
 from .models import Skill, CustomUser, Conversation, Message, Review, SkillSwapRequest
 from rest_framework import viewsets, status, serializers
 from rest_framework.response import Response
@@ -35,20 +35,11 @@ class SkillViewSet(viewsets.ModelViewSet):
     serializer_class = SkillSerializer
 
     def get_queryset(self):
-        return Skill.objects.filter(user=self.request.user).select_related('user')
+        return Skill.objects.filter(user=self.request.user).select_related('user').prefetch_related('reviews')
 
     def get_serializer_acontext(self):
         return {'request': self.request}
     
-class SkillPublicViewSet(viewsets.ReadOnlyModelViewSet):
-    serializer_class = SkillPublicSerializer
-    permission_classes = [IsAuthenticated]
-
-    def get_serializer_context(self):
-        return {'request': self.request}
-    
-    def get_queryset(self):
-        return Skill.objects.select_related('user').prefetch_related('reviews')
     
 class SkillSwapRequestViewSet(viewsets.ModelViewSet):
     queryset = SkillSwapRequest.objects.all()
@@ -152,11 +143,7 @@ class SkillSwapRequestViewSet(viewsets.ModelViewSet):
             'message': 'Request declined successfully',
             'request': serializer.data
         }, status=status.HTTP_200_OK)
-
-class SkillPublicViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Skill.objects.all()
-    serializer_class = SkillPublicSerializer
-    permission_classes = [IsAuthenticated]
+    
 
 class CustomUserViewSet(viewsets.ModelViewSet):
     queryset = CustomUser.objects.all()
@@ -282,7 +269,7 @@ def search_skills(request):
     paginator.page_size = 20 
 
     result_page = paginator.paginate_queryset(skills, request)
-    serializer = SkillPublicSerializer(result_page, many=True, context={"request": request})
+    serializer = SkillSerializer(result_page, many=True, context={"request": request})
     return paginator.get_paginated_response(serializer.data)
 
 class ConfirmEmailView(APIView):
@@ -355,7 +342,7 @@ class CookieTokenObtainPairView(TokenObtainPairView):
                 max_age=5 * 60,  
                 httponly=True,
                 secure=True,  
-                samesite='Lax',
+                samesite='None',
                 path='/'
             )
 
@@ -365,9 +352,12 @@ class CookieTokenObtainPairView(TokenObtainPairView):
                 max_age=7 * 24 * 60 * 60,  
                 httponly=True,
                 secure=True,
-                samesite='Lax',
-                path='/api/token/refresh/' 
+                samesite='None',
+                path='/' 
             )
+
+            print(access)
+            print(refresh)
 
             del response.data["access"]
             del response.data["refresh"]
@@ -398,8 +388,8 @@ class CookieTokenRefreshView(TokenRefreshView):
             value=access_token,
             max_age=cookie_max_age,
             httponly=True,
-            secure=False, 
-            samesite='Lax',
+            secure=True,
+            samesite='None',
             path='/'
         )
 

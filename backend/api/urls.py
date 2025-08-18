@@ -8,7 +8,6 @@ router.register(r'skills', SkillViewSet, basename='skills')
 router.register(r'users', CustomUserViewSet, basename='users')
 router.register(r'conversations', ConversationViewSet, basename='conversations')
 router.register(r'messages', MessageViewSet, basename='messages')
-router.register(r'skills-public', SkillPublicViewSet, basename='skills-public')  
 router.register(r'requests', SkillSwapRequestViewSet, basename='requests')
 router.register(r'reviews', ReviewViewSet, basename='reviews')
 

@@ -198,27 +198,6 @@ const SkillEdit = ({ skill, onClose }) => {
                         )}
                     </div>
 
-                    {process.env.NODE_ENV === 'development' && (
-                        <div className="text-xs text-gray-500 border p-2 rounded">
-                            <p>Debug: Picture selected: {picture ? 'Yes' : 'No'}</p>
-                            <p>Debug: Picture name: {picture?.name || 'None'}</p>
-                            <p>Debug: Picture size: {picture?.size || 'N/A'}</p>
-                            <p>Debug: Skill ID: {skill.id}</p>
-                            <button
-                                type="button"
-                                onClick={() => {
-                                    console.log('=== DEBUG INFO ===');
-                                    console.log('Current skill:', skill);
-                                    console.log('Form state:', { title, difficulty, hours, description });
-                                    console.log('Selected picture:', picture);
-                                }}
-                                className="mt-2 px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs"
-                            >
-                                Log Debug Info
-                            </button>
-                        </div>
-                    )}
-
                     <div className="flex gap-3 pt-6 border-t border-gray-200">
                         <button
                             type="button"

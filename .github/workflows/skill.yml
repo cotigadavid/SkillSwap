@@ -30,6 +30,10 @@ jobs:
       SECRET_KEY: 'ci-test-key-not-for-production'
       DEBUG: 'False'
       ALLOWED_HOSTS: 'localhost,127.0.0.1'
+      FRONTEND_URL: 'https://localhost:3000'
+      BACKEND_URL: 'https://127.0.0.1:8000'
+      EMAIL_HOST_USER: 'skillswapcommunication@gmail.com'
+      EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}   
 
     steps:
     - uses: actions/checkout@v3
