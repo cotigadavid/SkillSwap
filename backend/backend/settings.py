@@ -28,8 +28,8 @@ ALLOWED_HOSTS = config('ALLOWED_HOSTS', '').split(',')
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
-MEDIA_URL = '/media/'        # URL prefix to access media files
-MEDIA_ROOT = BASE_DIR / 'media'  # The folder where files will be stored
+# MEDIA_URL = '/media/'        # URL prefix to access media files
+# MEDIA_ROOT = BASE_DIR / 'media'  # The folder where files will be stored
 
 FRONTEND_URL = config('FRONTEND_URL') 
 BACKEND_URL = config('BACKEND_URL')
@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'corsheaders',
+    'storages',
     'api',
 ]
 
@@ -99,6 +100,18 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'backend.wsgi.application'
+
+AWS_ACCESS_KEY_ID = config("AWS_ACCESS_KEY_ID")
+AWS_SECRET_ACCESS_KEY = config("AWS_SECRET_ACCESS_KEY")
+AWS_STORAGE_BUCKET_NAME = config("AWS_STORAGE_BUCKET_NAME")
+AWS_S3_REGION_NAME = "eu-north-1"
+AWS_QUERYSTRING_AUTH = False  # so URLs are public
+
+# Default file storage (for media uploads)
+DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
+
+# Media URL (points to S3 instead of /media/)
+MEDIA_URL = f"https://{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com/"
 
 
 # Database

@@ -17,7 +17,8 @@ class CustomUserManager(BaseUserManager):
         return user
 
 class CustomUser(AbstractUser):
-    profile_picture = models.ImageField(upload_to='profile_pictures/', storage=OverwriteStorage(), blank=True, null=True, default='profile_pictures/grey.png')
+    #profile_picture = models.ImageField(upload_to='profile_pictures/', blank=True, null=True, default='profile_pictures/grey.png')
+    profile_picture = models.CharField(max_length=100, blank=True, null=True, default='profile_pictures/grey.png')
     phone_number = models.CharField(max_length=10)
     birth_date = models.DateField(blank=True, null=True)
     residing_city = models.CharField(max_length=50, blank=True, null=True)
@@ -85,7 +86,7 @@ class Message(models.Model):
 
 class MessageAttachment(models.Model):
     message = models.ForeignKey(Message, on_delete=models.CASCADE, related_name="attachments")
-    file = models.FileField(upload_to='messages/', storage=OverwriteStorage())
+    file = models.FileField(upload_to='messages/')
     filename = models.CharField(max_length=100, default='file')
     uploaded_at = models.DateTimeField(auto_now_add=True)
 

@@ -47,10 +47,16 @@ const SkillEdit = ({ skill, onClose }) => {
 
                 console.log('FormData created with skill_picture field');
 
-                const imageResponse = await secureAxios.patch(
-                    `skills/${skill.id}/`,
-                    imageFormData
-                );
+                // const imageResponse = await secureAxios.patch(
+                //     `skills/${skill.id}/`,
+                //     imageFormData
+                // );
+
+                const imageResponse = await secureAxios.patch(`skills/${skill.id}/`, imageFormData, {
+                headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                })
 
                 console.log('✅ Image updated successfully:', imageResponse.data);
             }
@@ -108,7 +114,7 @@ const SkillEdit = ({ skill, onClose }) => {
         <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
             <div className="bg-white rounded-[6px] w-full max-w-lg p-6 overflow-y-auto max-h-[90vh] shadow-lg">
                 <h2 className="text-xl font-semibold mb-6 text-gray-900">Edit Skill</h2>
-                <form onSubmit={handleSave} className="space-y-6">
+                <div className="space-y-6">
                     <div>
                         <label className="block mb-2 font-medium text-gray-900">Title</label>
                         <input
@@ -209,13 +215,14 @@ const SkillEdit = ({ skill, onClose }) => {
                         </button>
                         <button
                             type="submit"
+                            onClick={handleSave}
                             disabled={isLoading}
                             className="flex-1 px-6 py-3 bg-teal-500 hover:bg-teal-600 text-white rounded-[6px] font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             {isLoading ? 'Saving...' : 'Save Changes'}
                         </button>
                     </div>
-                </form>
+                </div>
             </div>
         </div>
     );

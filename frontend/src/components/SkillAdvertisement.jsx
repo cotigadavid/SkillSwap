@@ -5,7 +5,7 @@ function SkillAdvertisement({skill}) {
     <div className="bg-white p-4 flex flex-col sm:flex-row items-start sm:items-center gap-4">
         <img
         className="w-16 h-16 rounded-full object-cover border border-gray-300"
-        src={skill.user.profile}
+        src={`https://skillswap-bucket.s3.eu-north-1.amazonaws.com/${skill.user.profile}`}
         alt="Profile"
         loading="lazy"
         />

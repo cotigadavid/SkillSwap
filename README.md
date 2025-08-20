@@ -5,7 +5,7 @@
    
 <h2>
     <p>Check out the website at</p>
-    <a href="https://github.com/Louis3797/awesome-readme-template">https://skillswap-frontend-gn9c.onrender.com</a>
+    <a href="https://skillswap-frontend-gn9c.onrender.com">https://skillswap-frontend-gn9c.onrender.com</a>
     <p>Unfortunately the server spins down due to inactivity. It could take up to a minute for the application to load.</p>
     <a href="https://youtube.com">Or watch the demo</a>
   </h2>
@@ -20,14 +20,7 @@
   * [Screenshots](#camera-screenshots)
   * [Tech Stack](#space_invader-tech-stack)
   * [Features](#dart-features)
-  * [Color Reference](#art-color-reference)
-  * [Environment Variables](#key-environment-variables)
-- [Getting Started](#toolbox-getting-started)
-  * [Prerequisites](#bangbang-prerequisites)
-  * [Installation](#gear-installation)
-  * [Running Tests](#test_tube-running-tests)
-  * [Run Locally](#running-run-locally)
-  * [Deployment](#triangular_flag_on_post-deployment)
+- [Project Setup](#toolbox-getting-started)
 - [Usage](#eyes-usage)
 - [Contributors](#wave-contributing)
 
@@ -44,7 +37,7 @@ SkillSwap is a platform that enables users to share skills and teach each other 
 ### Screenshots
 
 <div align="center"> 
-  <img src="https://placehold.co/600x400?text=Your+Screenshot+here" alt="screenshot" />
+  <img src="https://res.cloudinary.com/duqjyquqy/image/upload/v1755550028/Screenshot_from_2025-08-18_23-42-40_vox7u2.png" width="740" height="384" alt="screenshot" />
 </div>
 
 
@@ -52,19 +45,40 @@ SkillSwap is a platform that enables users to share skills and teach each other 
 ### Tech Stack
 
 <ul>
-  <li><a href="https://www.djangoproject.com/">Django</a></li>
+  <li><a href="https://www.django-rest-framework.org/">Django REST Framework</a></li>
   <li><a href="https://reactjs.org/">React.js</a></li>
   <li><a href="https://tailwindcss.com/">TailwindCSS</a></li>
   <li><a href="https://www.postgresql.org/">PostgreSQL</a></li>
 </ul>
 
 <!-- Features -->
-### Features
+## Features
 
-- Feature 1
-- Feature 2
-- Feature 3
+### Authentication & Authorization
+- Sign up, login, and logout
+- JWT-based authentication
+- Protected API routes
+- Email verification
 
+### User Profiles
+- Update profile information (phone, city, county, birth date)
+- Upload profile picture
+- View other users’ profiles
+
+### Skills
+- Create, edit, and delete skills
+- Upload images for skills
+- Track skill difficulty and estimated learning time
+- Send, accept and reject collaboration requests
+
+### Messaging
+- Real-time conversations between users
+- Send text and file attachments
+- Received/Seen icons for enhanced UX
+
+### Search & Discovery
+- Search different skills
+- Filter skills by difficulty or rating
 
 
 ## Project Setup Guide
@@ -149,7 +163,7 @@ Frontend runs at: [http://localhost:3000](http://localhost:3000)
 
 
 <!-- Usage -->
-## :eyes: Usage
+## Usage
 
 Use this space to tell a little more about your project and how it can be used. Show additional screenshots, code samples, demos or link to other resources.
 

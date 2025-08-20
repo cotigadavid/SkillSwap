@@ -12,9 +12,22 @@ const AddProfilePicture = ( {closeFunction} ) => {
         if (!file) return;
 
         try {
+            
+            const payload = [{filename: file.name, content_type: file.type}];
+
+            const presigned_urls = (await secureAxios.post("/generate-upload-url/", {files: payload})).data;
+
+            const { url, key } = presigned_urls[0];
+
+            await fetch(url, {
+                method: "PUT",
+                headers: { "Content-Type": file.type },
+                body: file
+            });
+
             const userId = localStorage.getItem('userId');
             const formData = new FormData();
-            formData.append('profile_picture', file);
+            formData.append('profile_picture', key);
 
             const response = await secureAxios.patch(`users/${userId}/`, formData, {
                 headers: {
@@ -34,7 +47,7 @@ const AddProfilePicture = ( {closeFunction} ) => {
         }
 
         closeFunction();
-    }
+    };
    
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">

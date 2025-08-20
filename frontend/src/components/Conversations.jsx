@@ -15,7 +15,7 @@ const Conversations = () => {
                 const data = response.data;
                 
                 const filtered = data.results.filter(convo =>
-                    convo.sender === userId || convo.receiver === userId
+                    convo.sender === userId
                 );
                 
                 const conversationsWithUsers = await Promise.all(
@@ -93,7 +93,7 @@ const Conversations = () => {
                                         <div className="flex-shrink-0">
                                             {convo.otherUser.profile_picture ? (
                                                 <img
-                                                    src={convo.otherUser.profile_picture}
+                                                    src={`https://skillswap-bucket.s3.eu-north-1.amazonaws.com/${convo.otherUser.profile_picture}`}
                                                     alt={convo.otherUser.username}
                                                     className="w-12 h-12 rounded-full object-cover border border-gray-200"
                                                 />

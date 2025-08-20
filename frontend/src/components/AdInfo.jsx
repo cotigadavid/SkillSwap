@@ -16,7 +16,7 @@ function AdInfo({ ad }) {
       <div className="flex items-center gap-4 mb-6">
         <img
           className="w-16 h-16 rounded-full object-cover border border-gray-300"
-          src={ad.user.profile}
+          src={`https://skillswap-bucket.s3.eu-north-1.amazonaws.com/${ad.user.profile}`}
           alt="Profile"
         />
        

@@ -1,7 +1,7 @@
 from django.shortcuts import render
 
 from .serializers import SkillSerializer, CustomUserSerializer, ConversationSerializer, MessageSerializer, RegisterSerializer, ReviewSerializer, SkillSwapRequestSerializer, SkillRequestListSerializer
-from .models import Skill, CustomUser, Conversation, Message, Review, SkillSwapRequest
+from .models import *
 from rest_framework import viewsets, status, serializers
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -26,16 +26,19 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView,
 )
 from django.db.models import Q
-
+import boto3
+import uuid
 
 # Create your views here.
 
 class SkillViewSet(viewsets.ModelViewSet):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
     serializer_class = SkillSerializer
+    queryset = Skill.objects.all()
+    pagination_class = None
 
-    def get_queryset(self):
-        return Skill.objects.filter(user=self.request.user).select_related('user').prefetch_related('reviews')
+    # def get_queryset(self):
+    #     return Skill.objects.filter(user=self.request.user).select_related('user').prefetch_related('reviews')
 
     def get_serializer_acontext(self):
         return {'request': self.request}
@@ -169,7 +172,6 @@ class ConversationViewSet(viewsets.ModelViewSet):
 
         if not receiver_id:
             return Response({'error': 'receiver_id is required'}, status=status.HTTP_400_BAD_REQUEST)
-
         try:
             receiver = User.objects.get(id=receiver_id)
         except User.DoesNotExist:
@@ -192,6 +194,7 @@ class MessageViewSet(viewsets.ModelViewSet):
     serializer_class = MessageSerializer
     permission_classes = [IsAuthenticated]
     pagination_class = None
+
 
 class RegisterView(APIView):
     permission_classes = [AllowAny]
@@ -218,7 +221,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-def MarkConversationAsRead(request):
+def markConversationAsRead(request):
     print(request.data.get('conversation_id'))
     conversation_id = request.data.get('conversation_id')
     if not conversation_id: 
@@ -233,7 +236,7 @@ def MarkConversationAsRead(request):
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-def MarkConversationAsReceived(request):
+def markConversationAsReceived(request):
     conversation_id = request.data.get('conversation_id')
     if not conversation_id:
         return Response({'error': 'Missing conversation_id'}, status=400)
@@ -404,3 +407,42 @@ def logout_view(request):
     response.delete_cookie('refresh_token', path='/api/token/refresh/')
     
     return response
+
+
+s3 = boto3.client(
+    's3',
+    aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+    aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+    region_name=settings.AWS_S3_REGION_NAME
+)
+
+@api_view(['POST', 'PUT'])
+def generate_upload_url(request):
+    files = request.data.get('files', [])
+    if not files:
+        return Response({"error": "No files provided"}, status=400)
+
+    presigned_urls = []
+
+    for file in files:
+        filename = file.get("filename")
+        content_type = file.get("content_type")
+
+        if not filename or not content_type:
+            continue
+
+        key = f"{uuid.uuid4()}_{filename}"
+
+        url = s3.generate_presigned_url(
+            'put_object',
+            Params={
+                'Bucket': settings.AWS_STORAGE_BUCKET_NAME,
+                'Key': key,
+                'ContentType': content_type,
+            },
+            ExpiresIn=3600
+        )
+
+        presigned_urls.append({"url": url, "key": key, "file": file})
+
+    return Response(presigned_urls)

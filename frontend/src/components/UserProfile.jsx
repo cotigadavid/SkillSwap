@@ -41,7 +41,7 @@ const UserProfile = () => {
                         <div className="flex flex-col items-center mb-8">
                             <div className="relative w-[100px] h-[100px] mb-4">
                                 <img
-                                    src={`${user.profile_picture}`}
+                                    src={`https://skillswap-bucket.s3.eu-north-1.amazonaws.com/${user.profile_picture}`}
                                     className="rounded-full object-cover w-full h-full border-2 border-gray-200"
                                     alt="Profile"
                                 />

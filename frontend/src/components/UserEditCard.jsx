@@ -22,15 +22,11 @@ const UserEditCard = ({ user }) => {
             formData.append('residing_city', residingCity);
             formData.append('residing_county', residingCounty);
 
-            await secureAxios.patch(`users/${userId}/`, {
-                body: formData,
-            });
+            await secureAxios.patch(`users/${userId}/`, formData);
         } catch (error) {
             console.error("Error fetching users: ", error);
         }
     };
-
-    const navigate = useNavigate();
 
     const handleDiscard = () => {
         setPhoneNumber(user.phone_number || "");

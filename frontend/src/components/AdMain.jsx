@@ -21,7 +21,14 @@ function AdMain() {
                 ]);
 
                 setAd(adResponse.data);
-                setMySkills(skillsResponse.data.results);
+
+                const currentUserId = localStorage.getItem("userId");
+
+                const filteredSkills = skillsResponse.data.filter(
+                    (skill) => skill.user?.id.toString() === currentUserId
+                );
+
+                setMySkills(filteredSkills);
 
             } catch (error) {
                 console.error('Error fetching data:', error);

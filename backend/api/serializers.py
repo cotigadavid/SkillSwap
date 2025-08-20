@@ -55,7 +55,7 @@ class SkillSerializer(serializers.ModelSerializer):
         return {
             'id': user.id,
             'name': f"{user.last_name} {user.first_name}",
-            'profile': config("BACKEND_URL") + user.profile_picture.url if user.profile_picture else None,
+            'profile': user.profile_picture if user.profile_picture else None,
             'location': f"{user.residing_city}, {user.residing_county}",
         }
     
@@ -70,6 +70,7 @@ class SkillSerializer(serializers.ModelSerializer):
 class CustomUserSerializer(serializers.ModelSerializer):
     skills = SkillSerializer(many=True)
     age = serializers.SerializerMethodField()
+    #profile_picture = serializers.ImageField(required=False) 
 
     def get_age(self, obj):
         return obj.age
@@ -147,7 +148,7 @@ class SkillRequestListSerializer(serializers.ModelSerializer):
             "id": sender.id,
             "name": f"{sender.last_name} {sender.first_name}",
             "profile_picture" : (
-                self.context['request'].build_absolute_uri(obj.sender.profile_picture.url)
+                self.context['request'].build_absolute_uri(obj.sender.profile_picture)
                 if obj.sender.profile_picture else None
             ) 
         }
@@ -170,8 +171,26 @@ class MessageAttachmentSerializer(serializers.ModelSerializer):
         model = MessageAttachment
         fields = '__all__'
 
+# class MessageSerializer(serializers.ModelSerializer):
+#     attachments = MessageAttachmentSerializer(many=True, read_only=True)
+#     created_at = serializers.ReadOnlyField()
+
+#     class Meta:
+#         model = Message
+#         fields = '__all__'
+
+#     def create(self, validated_data):
+#         request = self.context.get('request')
+#         files = request.FILES.getlist('attachments')
+#         message = Message.objects.create(**validated_data)
+#         for file in files:
+#             filename = file
+#             MessageAttachment.objects.create(message=message, file=file, filename=filename)
+#         return message
+    
 class MessageSerializer(serializers.ModelSerializer):
     attachments = MessageAttachmentSerializer(many=True, read_only=True)
+    attachment_keys = serializers.ListField(child=serializers.CharField(), write_only=True, required=False)
     created_at = serializers.ReadOnlyField()
 
     class Meta:
@@ -179,12 +198,17 @@ class MessageSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def create(self, validated_data):
-        request = self.context.get('request')
-        files = request.FILES.getlist('attachments')
+        attachment_keys = validated_data.pop('attachment_keys', [])
         message = Message.objects.create(**validated_data)
-        for file in files:
-            filename = file
-            MessageAttachment.objects.create(message=message, file=file, filename=filename)
+        
+        for key in attachment_keys:
+            # Assuming your MessageAttachment model has a field for the file key/URL
+            # You'll need to adjust this based on your model structure
+            MessageAttachment.objects.create(
+                message=message, 
+                file=key,
+                filename=key.split('_')[-1]  # extract filename from key
+            )
         return message
 
 

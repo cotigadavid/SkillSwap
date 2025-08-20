@@ -17,10 +17,11 @@ urlpatterns = [
     path('token/refresh/', CookieTokenRefreshView.as_view(), name='token_refresh'),
     path('register/', RegisterView.as_view(), name="register"),
     path('logout/', logout_view, name='logout'),
-    path('mark-read/', MarkConversationAsRead, name="mark-read"),
-    path('mark-received/', MarkConversationAsReceived, name="mark-received"),
+    path('mark-read/', markConversationAsRead, name="mark-read"),
+    path('mark-received/', markConversationAsReceived, name="mark-received"),
     path('skills_search/', search_skills, name="skills-search"),
     path('confirm-email/<uidb64>/<token>/', ConfirmEmailView.as_view(), name="confirm-email"),
     path('reset-password/', ResetPasswordView.as_view(), name="reset-password"),
     path('choose-password/<uid>/<token>/', ChoosePasswordView.as_view(), name="choose-password"),
+    path('generate-upload-url/', generate_upload_url),
 ]
