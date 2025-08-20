@@ -16,6 +16,7 @@ const ChatWindow = () => {
     const [blocked, setBlocked] = useState(false);
     const [loading, setLoading] = useState(true);
     const [messagesLoading, setMessagesLoading] = useState(true);
+    const [initialMessagesLoaded, setInitialMessagesLoaded] = useState(false);
 
     
     const { convId } = useParams();
@@ -31,7 +32,11 @@ const ChatWindow = () => {
         try {
             const formData = new FormData();
             formData.append("conversation", parseInt(convId));
-            formData.append("text", message);
+
+            if (message.trim()) {
+                formData.append("text", message);
+            }
+
             formData.append("is_received", false);
             formData.append("is_sent", false);
 
@@ -109,7 +114,10 @@ const ChatWindow = () => {
 
     const fetchMessage = async () => {
         try {
-            setMessagesLoading(true); 
+            if (!initialMessagesLoaded) {
+                setMessagesLoading(true);
+            }
+            
             const response = await secureAxios.get(`messages/`);
             const data = await response.data;
             const filtered = data.filter(mess => 
@@ -119,10 +127,12 @@ const ChatWindow = () => {
         } catch (error) {
             console.error("Error fetching messages: ", error);
         } finally {
-            setMessagesLoading(false);
+            if (!initialMessagesLoaded) {
+                setMessagesLoading(false);
+                setInitialMessagesLoaded(true);
+            }
         }
     };
-
 
     useEffect(() => {
         fetchMessage();
@@ -197,7 +207,10 @@ const ChatWindow = () => {
             <div className="min-h-screen bg-white py-8 px-4">
                 <div className="max-w-4xl mx-auto">
                     <div className="bg-white border border-gray-200 rounded-[6px] p-8">
-                        <p className="text-center text-gray-600">Loading conversation...</p>
+                        <div className="flex items-center justify-center">
+                            <div className="animate-spin rounded-full h-10 w-10 border-t-4 border-teal-500 border-solid mr-3"></div>
+                            <p className="text-gray-600">Loading conversation...</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -328,7 +341,6 @@ const ChatWindow = () => {
 
                 {/* Message Input */}
                 <div className="bg-white border border-gray-200 rounded-[6px] p-6">
-                    {/* File attachments preview */}
                     {filesArray.length > 0 && (
                         <div className="mb-4 space-y-2">
                             <p className="text-sm font-medium text-gray-900">Attached files:</p>
@@ -380,7 +392,7 @@ const ChatWindow = () => {
                         </div>
                     </form>
 
-                    {/* File Upload Modal */}
+                    {/* File Upload */}
                     {showFileUpload && (
                         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                             <div className="bg-white border border-gray-200 rounded-[6px] p-6 w-full max-w-md mx-4">

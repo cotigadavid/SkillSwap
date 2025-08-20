@@ -78,9 +78,11 @@ const UserProfile = () => {
                         )}
                     </>
                 ) : (
-                    <div className="bg-white border border-gray-200 rounded-[6px] p-8">
-                        <p className="text-center text-gray-600">Loading...</p>
+                    <div className="bg-white border border-gray-200 rounded-[6px] p-8 flex flex-col items-center justify-center">
+                        <div className="animate-spin rounded-full h-10 w-10 border-t-4 border-teal-500 border-solid mb-4"></div>
+                        <p className="text-center text-gray-600">Loading user profile...</p>
                     </div>
+
                 )}
             </div>
         </div>

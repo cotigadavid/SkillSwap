@@ -88,7 +88,7 @@ const Navbar = ({ onNavigate, hidden = false }) => {
                         </div>
 
                         <div className="flex items-center space-x-1">
-                            {/* Afișează navigația doar dacă utilizatorul e logat */}
+
                             {isLoggedIn && (
                                 <>
                                     <button
@@ -139,7 +139,6 @@ const Navbar = ({ onNavigate, hidden = false }) => {
                     </div>
                 </div>
 
-                {/* Mobile navigation - se afizeaza doar cand esti logat */}
                 {isLoggedIn && (
                     <div className="sm:hidden border-t border-gray-200 bg-gray-50">
                         <div className="px-2 py-2 space-x-1 flex justify-around">

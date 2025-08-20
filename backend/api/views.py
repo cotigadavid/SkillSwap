@@ -8,6 +8,7 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.exceptions import ValidationError, AuthenticationFailed
 from django.db import models
+from django.db.models import Case, When, IntegerField, Q
 from rest_framework.decorators import action, api_view, permission_classes
 from django.http import JsonResponse
 from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank, TrigramSimilarity
@@ -247,30 +248,66 @@ def MarkConversationAsReceived(request):
 
 @api_view(['GET'])
 def search_skills(request):
-    query = request.GET.get('query', '')
+    query = (request.GET.get('query') or '').strip()
 
-    base_queryset = Skill.objects.select_related('user').prefetch_related('reviews')
+    base_queryset = (
+        Skill.objects
+        .select_related('user')
+        .prefetch_related('reviews')
+    )
 
-    if (query):
-        vector = SearchVector('title')
-        search_query = SearchQuery(query)
-        skills = base_queryset.annotate(
-            rank=SearchRank(vector, search_query),
-            similarity=TrigramSimilarity('title', query),
-            score=Greatest(SearchRank(vector, search_query), TrigramSimilarity('title', query) - 0.3)
-        ).filter(score__gt=0.0).order_by('-score')
+    if not query:
+        skills = base_queryset.all()
     else:
-        skills = base_queryset.all()
+        trigram_threshold = 0.20 if len(query) >= 4 else 0.10
 
-    if (skills.count() == 0):
-        skills = base_queryset.all()
+        vector = SearchVector('title', weight='A')
+        search_query = SearchQuery(query)
+
+        skills = (
+            base_queryset
+            .annotate(
+                exact_match=Case(
+                    When(title__iexact=query, then=1),
+                    default=0,
+                    output_field=IntegerField()
+                ),
+                prefix_match=Case(
+                    When(title__istartswith=query, then=1),
+                    default=0,
+                    output_field=IntegerField()
+                ),
+                contains_match=Case(
+                    When(title__icontains=query, then=1),
+                    default=0,
+                    output_field=IntegerField()
+                ),
+                rank=SearchRank(vector, search_query),
+                similarity=TrigramSimilarity('title', query),
+            )
+            .filter(
+                Q(exact_match=1) |
+                Q(prefix_match=1) |
+                Q(contains_match=1) |
+                Q(rank__gt=0.0) |
+                Q(similarity__gte=trigram_threshold)
+            )
+            .order_by(
+                '-exact_match',
+                '-prefix_match',
+                '-contains_match',
+                '-rank',
+                '-similarity'
+            )
+        )
 
     paginator = PageNumberPagination()
-    paginator.page_size = 20 
+    paginator.page_size = 20
+    page = paginator.paginate_queryset(skills, request)
 
-    result_page = paginator.paginate_queryset(skills, request)
-    serializer = SkillSerializer(result_page, many=True, context={"request": request})
+    serializer = SkillSerializer(page, many=True, context={'request': request})
     return paginator.get_paginated_response(serializer.data)
+
 
 class ConfirmEmailView(APIView):
     permission_classes = [AllowAny]
