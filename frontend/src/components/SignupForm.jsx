@@ -1,10 +1,9 @@
 import { useState } from "react";
 import PasswordInput from './PasswordInput';
-import { jwtDecode } from 'jwt-decode';
 import { useNavigate } from "react-router-dom";
 
 const SignupForm = () => {
-    const [email, setEmail] = useState('')
+    const [email, setEmail] = useState('');
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
@@ -58,13 +57,12 @@ const SignupForm = () => {
         }
     };
 
-
-   const toggleShowPassword = () => {
+    const toggleShowPassword = () => {
         setShowPassword(prev => !prev);
-    }
+    };
 
     return (
-        <div className="space-y-4">
+        <form className="space-y-4" onSubmit={handleSubmit}>
             <input
                 type="email"
                 value={email}
@@ -89,12 +87,11 @@ const SignupForm = () => {
             />
             <button
                 type="submit"
-                onClick={handleSubmit}
                 className="w-full bg-teal-500 hover:bg-teal-600 text-white font-medium py-3 px-4 rounded-lg transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98]"
             >
                 Sign up
             </button>
-        </div>
+        </form>
     );
 };
 

@@ -78,7 +78,7 @@ class Message(models.Model):
         null=True
     )
 
-    text = models.CharField(max_length=1000)
+    text = models.CharField(max_length=1000, blank=True, default='')
     is_read = models.BooleanField(default=False)
     is_received = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)

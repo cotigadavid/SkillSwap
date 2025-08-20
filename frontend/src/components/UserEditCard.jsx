@@ -164,7 +164,7 @@ const UserEditCard = ({ user }) => {
             </form>
             
             <div className="mt-8 pt-6 border-t border-gray-200">
-                <AddSkill />
+                <AddSkill onSkillAdded={(newSkill) => setSkills(prev => [...prev, newSkill])} />
             </div>
         </div>
     );

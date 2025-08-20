@@ -1,10 +1,6 @@
 import { useState } from "react";
-import { jwtDecode } from 'jwt-decode';
-import { useNavigate } from "react-router-dom";
-import { Eye, EyeOff, ArrowLeft, X } from "lucide-react";
+import { useNavigate, Link } from "react-router-dom";
 import PasswordInput from "./PasswordInput";
-import { Link } from "react-router-dom";
-import secureAxios from "../secureAxios";
 
 const LoginForm = () => {
     const [username, setUsername] = useState('');
@@ -18,9 +14,6 @@ const LoginForm = () => {
         setIsLoading(true);
 
         try {
-            console.log('Username:', username);
-            console.log('Password:', password);
-
             const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}token/`, {
                 method: 'POST',
                 withCredentials: true,
@@ -29,8 +22,8 @@ const LoginForm = () => {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    username: username,
-                    password: password
+                    username,
+                    password
                 })
             });
 
@@ -39,12 +32,8 @@ const LoginForm = () => {
             }
 
             const data = await response.json();
-            console.log('Login successful:', data);
-            
             localStorage.setItem('userId', data["userId"]);
-            
             window.dispatchEvent(new Event('storage'));
-
             navigate("/");
             
         } catch (error) {
@@ -60,7 +49,7 @@ const LoginForm = () => {
     }
    
     return (
-        <div className="space-y-4">
+        <form className="space-y-4" onSubmit={handleSubmit}>
             <input
                 type="text"
                 value={username}
@@ -79,7 +68,6 @@ const LoginForm = () => {
             />
             <button
                 type="submit"
-                onClick={handleSubmit}
                 disabled={isLoading || !username || !password}
                 className="w-full bg-teal-500 hover:bg-teal-600 text-white font-medium py-3 px-4 rounded-lg transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
             >
@@ -94,7 +82,7 @@ const LoginForm = () => {
                     Forgot your password?
                 </button>
             </Link>
-        </div>
+        </form>
     );
 };
 

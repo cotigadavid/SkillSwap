@@ -6,6 +6,7 @@ import secureAxios from "../secureAxios";
 function SkillList() {
     const [query, setQuery] = useState('');
     const [skills, setSkills] = useState([]);
+    const [loading, setLoading] = useState(false); 
     const [showFilters, setShowFilters] = useState(false);
     const [minRating, setMinRating] = useState(3);
     const [easyChecked, setEasyChecked] = useState(true);
@@ -21,6 +22,7 @@ function SkillList() {
     const totalPages = Math.ceil(totalCount / pageSize);
 
     const handleSearch = async () => {
+        setLoading(true); 
         try {
             const response = await secureAxios.get(`/skills_search/`, {
                 params: { query, page }
@@ -32,12 +34,21 @@ function SkillList() {
             setTotalCount(response.data.count);
         } catch (error) {
             console.error("Search failed", error);
+        } finally {
+            setLoading(false); 
         }
     };
 
     useEffect(() => {
         handleSearch();
     }, [page]);
+
+    const handleKeyDown = (e) => {
+        if (e.key === "Enter") {
+            setPage(1);
+            handleSearch();
+        }
+    };
 
     const renderPageButtons = () => {
         const buttons = [];
@@ -97,6 +108,7 @@ function SkillList() {
 
     return (
         <div className="max-w-4xl mx-auto p-6">
+            {/* Search & Filters */}
             <div className="bg-white rounded-[6px] p-6 mb-8">
                 <div className="flex flex-col sm:flex-row items-center gap-4 mb-6">
                     <input
@@ -104,6 +116,7 @@ function SkillList() {
                         placeholder="Search skills..."
                         value={query}
                         onChange={(e) => setQuery(e.target.value)}
+                        onKeyDown={handleKeyDown}
                         className="flex-1 px-4 py-3 border border-gray-300 rounded-[6px] focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all duration-200 text-gray-900 placeholder-gray-500"
                     />
                     <button
@@ -161,66 +174,82 @@ function SkillList() {
                                 step="1"
                                 value={minRating}
                                 onChange={(e) => setMinRating(parseInt(e.target.value))}
-                                classNamea="w-full h-2 bg-gray-300 rounded appearance-none cursor-pointer accent-teal-500"
+                                className="w-full h-2 bg-gray-300 rounded appearance-none cursor-pointer accent-teal-500"
                             />
                         </div>
                     </div>
                 )}
             </div>
 
+            {/* Skill List */}
             <div className="bg-white rounded-[6px] p-6">
                 <h2 className="text-2xl font-semibold mb-6 text-gray-900">Skill Advertisements</h2>
-                <div className="space-y-4">
-                    {skills
-                        .filter(item => {
-                            const diff = item.difficulty;
-                            const rating = item.reviews.rating;
-                            return (
-                                (rating >= minRating || item.reviews.count === 0) &&
-                                (
-                                    (diff === "easy" && easyChecked) ||
-                                    (diff === "medium" && mediumChecked) ||
-                                    (diff === "hard" && hardChecked) ||
-                                    (diff === "serious" && seriousChecked)
-                                )
-                            );
-                        })
-                        .map(item => (
-                            <Link key={item.id} to={`/skills/${item.id}`} className="block">
-                                <div className="border border-gray-200 rounded-sm p-4 hover:border-gray-400 bg-white transition-colors duration-200">
-                                    <SkillAdvertisement skill={item} />
-                                </div>
-                            </Link>
-                        ))}
-                </div>
 
-                <div className="flex items-center justify-center mt-8 gap-2">
-                    <button
-                        onClick={() => setPage((p) => Math.max(p - 1, 1))}
-                        disabled={!prevPage}
-                        className={`p-2 w-10 h-10 rounded-full font-medium transition-all duration-200 ${
-                            prevPage 
-                                ? 'bg-teal-500 text-white hover:bg-teal-600' 
-                                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                        }`}
-                    >
-                        ←
-                    </button>
+                {loading ? (
+                    <div className="flex flex-col items-center justify-center p-8 border border-gray-200 rounded-[6px]">
+                        <div className="animate-spin rounded-full h-10 w-10 border-t-4 border-teal-500 border-solid mb-4"></div>
+                        <p className="text-center text-gray-600">Loading skills...</p>
+                    </div>
+                ) : skills.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center p-12 border border-gray-200 rounded-[6px]">
+                        <p className="text-center text-gray-500 text-lg">No skills matched your search.</p>
+                    </div>
+                ) : (
+                    <div className="space-y-4">
+                        {skills
+                            .filter(item => {
+                                const diff = item.difficulty;
+                                const rating = item.reviews.rating;
+                                return (
+                                    (rating >= minRating || item.reviews.count === 0) &&
+                                    (
+                                        (diff === "easy" && easyChecked) ||
+                                        (diff === "medium" && mediumChecked) ||
+                                        (diff === "hard" && hardChecked) ||
+                                        (diff === "serious" && seriousChecked)
+                                    )
+                                );
+                            })
+                            .map(item => (
+                                <Link key={item.id} to={`/skills/${item.id}`} className="block">
+                                    <div className="border border-gray-200 rounded-sm p-4 hover:border-gray-400 bg-white transition-colors duration-200">
+                                        <SkillAdvertisement skill={item} />
+                                    </div>
+                                </Link>
+                            ))}
+                    </div>
+                )}
 
-                    {renderPageButtons()}
+                {/* Pagination */}
+                {skills.length > 0 && (
+                    <div className="flex items-center justify-center mt-8 gap-2">
+                        <button
+                            onClick={() => setPage((p) => Math.max(p - 1, 1))}
+                            disabled={!prevPage}
+                            className={`p-2 w-10 h-10 rounded-full font-medium transition-all duration-200 ${
+                                prevPage 
+                                    ? 'bg-teal-500 text-white hover:bg-teal-600' 
+                                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                            }`}
+                        >
+                            ←
+                        </button>
 
-                    <button
-                        onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
-                        disabled={!nextPage}
-                        className={`p-2 w-10 h-10 rounded-full font-medium transition-all duration-200 ${
-                            nextPage 
-                                ? 'bg-teal-500 text-white hover:bg-teal-600' 
-                                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                        }`}
-                    >
-                        →
-                    </button>
-                </div>
+                        {renderPageButtons()}
+
+                        <button
+                            onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
+                            disabled={!nextPage}
+                            className={`p-2 w-10 h-10 rounded-full font-medium transition-all duration-200 ${
+                                nextPage 
+                                    ? 'bg-teal-500 text-white hover:bg-teal-600' 
+                                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                            }`}
+                        >
+                            →
+                        </button>
+                    </div>
+                )}
             </div>
         </div>
     );
