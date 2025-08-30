@@ -28,7 +28,7 @@ const UserInformationCard = ({ user, isOwnProfile = true }) => {
                         className="flex flex-col items-center gap-3 p-4 border border-gray-200 rounded-[6px] hover:border-gray-400 transition-all duration-200 w-full max-w-[220px]"
                     >
                         <img
-                            src={skill.skill_picture}
+                            src={`https://skillswap-bucket.s3.eu-north-1.amazonaws.com/${skill.skill_picture}`}
                             width="160"
                             height="80"
                             alt="Skill"

@@ -262,7 +262,7 @@ def search_skills(request):
     if not query:
         skills = base_queryset.all()
     else:
-        trigram_threshold = 0.20 if len(query) >= 4 else 0.10
+        trigram_threshold = 0.35 if len(query) >= 4 else 0.25
 
         vector = SearchVector('title', weight='A')
         search_query = SearchQuery(query)
@@ -292,12 +292,12 @@ def search_skills(request):
                 Q(exact_match=1) |
                 Q(prefix_match=1) |
                 Q(contains_match=1) |
-                Q(rank__gt=0.0) |
+                Q(rank__gt=0.1) |  
                 Q(similarity__gte=trigram_threshold)
             )
             .order_by(
                 '-exact_match',
-                '-prefix_match',
+                '-prefix_match', 
                 '-contains_match',
                 '-rank',
                 '-similarity'
