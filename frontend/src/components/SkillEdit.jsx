@@ -42,10 +42,21 @@ const SkillEdit = ({ skill, onClose }) => {
             if (picture) {
                 console.log('=== UPLOADING IMAGE ===');
                 
-                const imageFormData = new FormData();
-                imageFormData.append('skill_picture', picture);
+                const payload = [{filename: picture.name, content_type: picture.type}];
 
-                console.log('FormData created with skill_picture field');
+                const presigned_urls = (await secureAxios.post("/generate-upload-url/", {files: payload})).data;
+
+                const { url, key } = presigned_urls[0];
+
+                await fetch(url, {
+                    method: "PUT",
+                    headers: { "Content-Type": picture.type },
+                    body: picture
+                });
+
+                const imageFormData = new FormData();
+                imageFormData.append('skill_picture', key);
+
 
                 // const imageResponse = await secureAxios.patch(
                 //     `skills/${skill.id}/`,
@@ -179,7 +190,7 @@ const SkillEdit = ({ skill, onClose }) => {
                             <div className="mt-4">
                                 <p className="text-sm text-gray-600 mb-2">Current image:</p>
                                 <img
-                                    src={skill.skill_picture}
+                                    src={`https://skillswap-bucket.s3.eu-north-1.amazonaws.com/${skill.skill_picture}`}
                                     alt="Current skill"
                                     className="w-24 h-24 object-cover rounded-[6px] border border-gray-200"
                                 />

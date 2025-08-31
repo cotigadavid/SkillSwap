@@ -39,7 +39,8 @@ class CustomUser(AbstractUser):
 
 class Skill(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="skills", null=True, blank=True)
-    skill_picture = models.ImageField(upload_to='skill_pictures/', blank=True, null=True, default='skill_pictures/default.jpg')
+    #skill_picture = models.ImageField(upload_to='skill_pictures/', blank=True, null=True, default='skill_pictures/default.jpg')
+    skill_picture = models.CharField(max_length=100, blank=True, null=True, default='skill_pictures/default.jpg')
     title = models.CharField(max_length=20)
     description = models.TextField(null=True, blank=True)
     difficulty = models.CharField(max_length=20, choices=[('easy', 'easy'), ('medium', 'medium'), ('hard', 'hard'), ('serious', 'serious')])
@@ -78,7 +79,7 @@ class Message(models.Model):
         null=True
     )
 
-    text = models.CharField(max_length=1000)
+    text = models.CharField(max_length=1000, blank=True, default='')
     is_read = models.BooleanField(default=False)
     is_received = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)

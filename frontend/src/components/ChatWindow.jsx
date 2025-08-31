@@ -35,30 +35,12 @@ const ChatWindow = () => {
             formData.append("is_received", false);
             formData.append("is_sent", false);
 
-            // for (let file of filesArray) {
-            //     formData.append("attachments", file);
-            // }
-
-            // START
             const payload = filesArray.map(file => ({
                 filename: file.name,
                 content_type: file.type
             }));
 
             const presigned_urls = (await secureAxios.post("/generate-upload-url/", { files: payload })).data;
-
-            // for (let i = 0; i < presigned_urls.length; i++) {
-            //     const { url, key } = presigned_urls[i];
-            //     const file = filesArray[i];
-
-            //     formData.append("attachments", key);
-
-            //     await fetch(url, {
-            //         method: "PUT",
-            //         headers: { "Content-Type": file.type },
-            //         body: file
-            //     });
-            // }
 
             const attachment_keys = [];
             for (let i = 0; i < presigned_urls.length; i++) {
@@ -78,8 +60,6 @@ const ChatWindow = () => {
             attachment_keys.forEach(key => {
                 formData.append("attachment_keys", key);
             });
-
-
 
             const response = await secureAxios.post('messages/', formData, {
                 headers: {
