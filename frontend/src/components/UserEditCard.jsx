@@ -107,7 +107,7 @@ const UserEditCard = ({ user }) => {
                             >
                                 <div className="flex items-center gap-3">
                                     <img 
-                                        src={skill.skill_picture} 
+                                        src={`https://skillswap-bucket.s3.eu-north-1.amazonaws.com/${skill.skill_picture}`}
                                         width="40" 
                                         height="40" 
                                         alt="Skill" 

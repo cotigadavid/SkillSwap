@@ -53,11 +53,11 @@ const SkillEdit = ({ skill, onClose }) => {
                     headers: { "Content-Type": picture.type },
                     body: picture
                 });
- 
+
                 const imageFormData = new FormData();
                 imageFormData.append('skill_picture', key);
- 
- 
+
+
                 // const imageResponse = await secureAxios.patch(
                 //     `skills/${skill.id}/`,
                 //     imageFormData

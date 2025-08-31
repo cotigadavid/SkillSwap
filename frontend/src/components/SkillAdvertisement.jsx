@@ -11,7 +11,7 @@ function SkillAdvertisement({skill}) {
         />
         <img
         className="w-24 h-24 object-cover rounded border border-gray-300"
-        src={skill.skill_picture}
+        src={`https://skillswap-bucket.s3.eu-north-1.amazonaws.com/${skill.skill_picture}`}
         alt="Skill"
         loading="lazy"
         />
