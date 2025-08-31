@@ -1,6 +1,6 @@
 import { useState } from "react";
 import secureAxios from "../secureAxios";
-
+ 
 const SkillEdit = ({ skill, onClose }) => {
     const [title, setTitle] = useState(skill.title);
     const [difficulty, setDifficulty] = useState(skill.difficulty);
@@ -8,25 +8,25 @@ const SkillEdit = ({ skill, onClose }) => {
     const [description, setDescription] = useState(skill.description);
     const [picture, setPicture] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
-
+ 
     const handleSave = async (e) => {
         e.preventDefault();
         setIsLoading(true);
-
+ 
         try {
             console.log('=== STARTING SAVE PROCESS ===');
             console.log('Skill ID:', skill.id);
             console.log('Picture selected:', !!picture);
-
+ 
             const textData = {
                 title: title,
                 difficulty: difficulty,
                 hours_needed: parseInt(hours),
                 description: description
             };
-
+ 
             console.log('Sending text data:', textData);
-
+ 
             const response = await secureAxios.patch(
                 `skills/${skill.id}/`,
                 textData,
@@ -36,18 +36,18 @@ const SkillEdit = ({ skill, onClose }) => {
                     }
                 }
             );
-
+ 
             console.log('✅ Text data updated successfully');
-
+ 
             if (picture) {
                 console.log('=== UPLOADING IMAGE ===');
-                
+ 
                 const payload = [{filename: picture.name, content_type: picture.type}];
-
+ 
                 const presigned_urls = (await secureAxios.post("/generate-upload-url/", {files: payload})).data;
-
+ 
                 const { url, key } = presigned_urls[0];
-
+ 
                 await fetch(url, {
                     method: "PUT",
                     headers: { "Content-Type": picture.type },
@@ -62,28 +62,28 @@ const SkillEdit = ({ skill, onClose }) => {
                 //     `skills/${skill.id}/`,
                 //     imageFormData
                 // );
-
+ 
                 const imageResponse = await secureAxios.patch(`skills/${skill.id}/`, imageFormData, {
                 headers: {
                         'Content-Type': 'multipart/form-data',
                     },
                 })
-
+ 
                 console.log('✅ Image updated successfully:', imageResponse.data);
             }
-
+ 
             console.log('=== SAVE COMPLETED ===');
             alert('Skill updated successfully!');
             onClose();
             window.location.reload();
-
+ 
         } catch (error) {
             console.error("❌ ERROR:", error);
-            
+ 
             if (error.response) {
                 console.error("Error status:", error.response.status);
                 console.error("Error data:", error.response.data);
-
+ 
                 const errorMessage = error.response.data?.detail || 
                                    error.response.data?.message ||
                                    JSON.stringify(error.response.data);
@@ -96,22 +96,22 @@ const SkillEdit = ({ skill, onClose }) => {
             setIsLoading(false);
         }
     };
-
+ 
     const handlePictureChange = (e) => {
         const file = e.target.files[0];
         if (file) {
             console.log('File selected:', file);
-            
+ 
             const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
             if (validTypes.includes(file.type)) {
-               
+ 
                 const maxSize = 5 * 1024 * 1024; //
                 if (file.size > maxSize) {
                     alert("File size too large. Please select an image smaller than 5MB.");
                     e.target.value = '';
                     return;
                 }
-                
+ 
                 setPicture(file);
                 console.log('Picture state updated'); 
             } else {
@@ -120,7 +120,7 @@ const SkillEdit = ({ skill, onClose }) => {
             }
         }
     };
-
+ 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
             <div className="bg-white rounded-[6px] w-full max-w-lg p-6 overflow-y-auto max-h-[90vh] shadow-lg">
@@ -136,7 +136,7 @@ const SkillEdit = ({ skill, onClose }) => {
                             className="w-full px-4 py-3 border border-gray-300 rounded-[6px] focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all duration-200 text-gray-900"
                         />
                     </div>
-
+ 
                     <div>
                         <label className="block mb-2 font-medium text-gray-900">Difficulty</label>
                         <select
@@ -152,7 +152,7 @@ const SkillEdit = ({ skill, onClose }) => {
                             <option value="serious">Serious</option>
                         </select>
                     </div>
-
+ 
                     <div>
                         <label className="block mb-2 font-medium text-gray-900">Hours needed</label>
                         <input
@@ -164,7 +164,7 @@ const SkillEdit = ({ skill, onClose }) => {
                             className="w-full px-4 py-3 border border-gray-300 rounded-[6px] focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all duration-200 text-gray-900"
                         />
                     </div>
-
+ 
                     <div>
                         <label className="block mb-2 font-medium text-gray-900">Description</label>
                         <textarea
@@ -176,7 +176,7 @@ const SkillEdit = ({ skill, onClose }) => {
                             placeholder="Describe your skill..."
                         />
                     </div>
-
+ 
                     <div>
                         <label className="block mb-2 font-medium text-gray-900">Skill Image</label>
                         <input
@@ -185,7 +185,7 @@ const SkillEdit = ({ skill, onClose }) => {
                             onChange={handlePictureChange}
                             className="block w-full text-sm text-gray-500 file:mr-4 file:py-3 file:px-4 file:border file:border-gray-300 file:rounded-[6px] file:text-sm file:font-medium file:bg-white file:text-gray-700 hover:file:bg-gray-50 transition-all duration-200"
                         />
-
+ 
                         {skill.skill_picture && !picture && (
                             <div className="mt-4">
                                 <p className="text-sm text-gray-600 mb-2">Current image:</p>
@@ -196,7 +196,7 @@ const SkillEdit = ({ skill, onClose }) => {
                                 />
                             </div>
                         )}
-
+ 
                         {picture && (
                             <div className="mt-4">
                                 <p className="text-sm text-gray-600 mb-2">New image selected:</p>
@@ -214,7 +214,7 @@ const SkillEdit = ({ skill, onClose }) => {
                             </div>
                         )}
                     </div>
-
+ 
                     <div className="flex gap-3 pt-6 border-t border-gray-200">
                         <button
                             type="button"
@@ -238,5 +238,5 @@ const SkillEdit = ({ skill, onClose }) => {
         </div>
     );
 };
-
+ 
 export default SkillEdit;

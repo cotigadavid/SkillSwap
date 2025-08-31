@@ -25,7 +25,8 @@ function App() {
   
   const shouldHideNavbar = location.pathname === '/auth' || 
                           location.pathname === '/reset-password' ||
-                          location.pathname.startsWith('/choose-password/');
+                          location.pathname.startsWith('/choose-password/' ||
+                          location.pathname === '/confirm-email');
 
   return (
     <div className='main'>
