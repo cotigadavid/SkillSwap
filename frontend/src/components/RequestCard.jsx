@@ -10,7 +10,7 @@ const RequestCard = ({request, showActions, handleAccept, handleDecline, handleC
                     <div className="flex items-center mb-4">
                         {request.sender.profile_picture && (
                             <img 
-                                src={request.sender.profile_picture} 
+                                src={`https://skillswap-bucket.s3.eu-north-1.amazonaws.com/${request.sender.profile_picture}`} 
                                 alt="Profile" 
                                 className="w-12 h-12 rounded-full mr-4 border border-gray-200"
                             />

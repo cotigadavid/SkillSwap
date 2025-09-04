@@ -48,7 +48,7 @@ function AdInfo({ ad }) {
       <div className="mb-6">
         <img
           className="w-full h-64 object-cover rounded border border-gray-300"
-          src={ad.skill_picture}
+          src={`https://skillswap-bucket.s3.eu-north-1.amazonaws.com/${ad.skill_picture}`}
           alt="Skill"
         />
       </div>

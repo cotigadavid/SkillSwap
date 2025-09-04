@@ -276,7 +276,7 @@ const ChatWindow = () => {
                         >
                             {receiver.profile_picture ? (
                                 <img 
-                                    src={receiver.profile_picture} 
+                                    src={`https://skillswap-bucket.s3.eu-north-1.amazonaws.com/${receiver.profile_picture}`}  
                                     width="50" 
                                     height="50" 
                                     alt="Profile" 

@@ -31,7 +31,7 @@ const OtherProfile = () => {
     return (
         <div className="flex flex-col items-center space-y-4 p-4">
             <img
-                src={user.profile_picture}
+                
                 alt={`${user.first_name} ${user.last_name}`}
                 width={100}
                 height={100}
