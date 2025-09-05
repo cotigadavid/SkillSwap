@@ -5,7 +5,7 @@
     <p>Check out the website at</p>
     <a href="https://skillswap-frontend-gn9c.onrender.com">https://skillswap-frontend-gn9c.onrender.com</a>
     <p>Unfortunately the server spins down due to inactivity. It could take up to a minute for some requests.</p>
-    <a href="https://youtube.com">Or watch the demo on YouTube</a>
+    <a href="https://www.youtube.com/watch?v=n83cvWLQxes&feature=youtu.be">Or watch the demo on YouTube</a>
   </h2>
 </div>
 <br />
