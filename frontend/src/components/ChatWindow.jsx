@@ -18,71 +18,12 @@ const ChatWindow = () => {
     const [messagesLoading, setMessagesLoading] = useState(true);
     const [initialMessagesLoaded, setInitialMessagesLoaded] = useState(false);
 
-    
     const { convId } = useParams();
     const navigate = useNavigate();
 
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [messageList]);
-    
-    const sendMessage = async (message) => {
-        if (!message.trim() && filesArray.length === 0) return;
-
-        try {
-            const formData = new FormData();
-            formData.append("conversation", parseInt(convId));
-
-            if (message.trim()) {
-                formData.append("text", message);
-            }
-
-            formData.append("is_received", false);
-            formData.append("is_sent", false);
-
-            const payload = filesArray.map(file => ({
-                filename: file.name,
-                content_type: file.type
-            }));
-
-            const presigned_urls = (await secureAxios.post("/generate-upload-url/", { files: payload })).data;
-
-            const attachment_keys = [];
-            for (let i = 0; i < presigned_urls.length; i++) {
-                const { url, key } = presigned_urls[i];
-                const file = filesArray[i];
-
-                await fetch(url, {
-                    method: "PUT",
-                    headers: { "Content-Type": file.type },
-                    body: file
-                });
-
-                attachment_keys.push(key);
-            }
-
-            // Send keys instead of files
-            attachment_keys.forEach(key => {
-                formData.append("attachment_keys", key);
-            });
-
-            const response = await secureAxios.post('messages/', formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-                credentials: 'include',
-            });
-
-            console.log("--------------------");
-            console.log(response);
-
-            setFilesArray([]); 
-            await fetchMessage();
-
-        } catch (error) {
-            console.error('Error sending message:', error);
-        }
-    };
 
     useEffect(() => {
         const fetchConv = async () => {
@@ -115,6 +56,75 @@ const ChatWindow = () => {
 
         fetchConv();
     }, [convId]);
+
+    const sendMessage = async (message) => {
+        if (!message.trim() && filesArray.length === 0) return;
+
+        try {
+            const formData = new FormData();
+            formData.append("conversation", parseInt(convId));
+
+            if (message.trim()) {
+                formData.append("text", message);
+            }
+
+            formData.append("is_received", false);
+            formData.append("is_sent", false);
+
+            // only process files if there are any
+            if (filesArray.length > 0) {
+                const payload = filesArray.map(file => ({
+                    filename: file.name,
+                    content_type: file.type
+                }));
+
+                const presigned_urls = (await secureAxios.post("/generate-upload-url/", { files: payload })).data;
+
+                const attachment_keys = [];
+                for (let i = 0; i < presigned_urls.length; i++) {
+                    const { url, key } = presigned_urls[i];
+                    const file = filesArray[i];
+
+                    await fetch(url, {
+                        method: "PUT",
+                        headers: { "Content-Type": file.type },
+                        body: file
+                    });
+
+                    attachment_keys.push(key);
+                }
+
+                attachment_keys.forEach(key => {
+                    formData.append("attachment_keys", key);
+                });
+            }
+
+            const response = await secureAxios.post('messages/', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+                credentials: 'include',
+            });
+
+            console.log("Message sent successfully:", response);
+
+            setFilesArray([]); 
+            
+            // fetch messages immediately after sending
+            await fetchMessage();
+            
+            setTimeout(() => {
+                messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+            }, 100);
+
+        } catch (error) {
+            console.error('Error sending message:', error);
+            if (error.response) {
+                console.error('Error response data:', error.response.data);
+                console.error('Error response status:', error.response.status);
+            }
+        }
+    };
     
     useEffect(() => {
         if (!receiver?.id || !sender?.id) return;
