@@ -6,6 +6,13 @@ const UserInformationCard = ({ user, isOwnProfile = true }) => {
             </h3>
 
             <div className="space-y-3 mb-8">
+                {/*added first name and last name fields in user information card*/}
+                <p className="text-gray-700">
+                    <span className="font-medium text-gray-900">First Name:</span> {user.first_name}
+                </p>
+                <p className="text-gray-700">
+                    <span className="font-medium text-gray-900">Last Name:</span> {user.last_name}
+                </p>
                 <p className="text-gray-700">
                     <span className="font-medium text-gray-900">Phone Number:</span> {user.phone_number}
                 </p>
