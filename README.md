@@ -13,12 +13,23 @@
 <!-- Table of Contents -->
 # Table of Contents
 - [About the Project](#about-the-project)
-  * [Screenshots](#screenshots)
-  * [Tech Stack](#tech-stack)
-  * [Features](#features)
-- [Usage](#usage)
-- [Project Setup](#project-setup-guide)
+  - [Screenshots](#screenshots)
+  - [Tech Stack](#tech-stack)
+  - [Features](#features)
+- [User Stories](#user-stories)
+- [Backlog](#backlog)
+- [Diagrams](#diagrams)
+- [Project Setup Guide](#project-setup-guide)
+  - [Backend Setup](#backend-setup)
+  - [Frontend Setup (React)](#frontend-setup-react)
+- [Git Source Control](#git-source-control)
+- [Continuous Integration / Automated Testing](#continuous-integration--automated-testing)
+- [Bug Reporting](#bug-reporting)
+- [Code Standards](#code-standards)
+- [Design Patterns](#design-patterns)
+- [AI Models Usage Documentation](#ai-models-usage-documentation)
 - [Contributors](#contributors)
+
  
 <!-- About the Project -->
 ## About the Project
@@ -81,28 +92,84 @@ SkillSwap is a platform that enables users to share skills and teach each other 
 - Search different skills
 - Filter skills by difficulty or rating
 
-## Usage
+## User Stories
+- As a user, I want to register an account and verify my email so that I can access the platform.
+- As a user, I want to log in to my account so that I can manage my skills.
+- As a user, I want to navigate to "My Profile" so that I can view and edit my personal information.
+- As a user, I want to add new skill details, including photo, title, description, difficulty, and time estimate, so that others can see what I can teach.
+- As a user, I want my added skills to be visible to other users on the platform.
+- As a user, I want to use the search bar and filter tab to find skills by keywords so that I can quickly find skills I’m interested in.
+- As a user, I want to find a skill I want to learn so that I can exchange knowledge with another user.
+- As a user, I want to click on a skill to view its details so that I can learn more about it before starting.
+- As a user, I want to send a skill swap request offering one or more of my skills in exchange so that I can initiate a learning collaboration.
+- As a user, I want to wait for the other user to accept my request so that I know when the collaboration can start.
+- As a user, I want to start messaging once the request is accepted so that we can coordinate learning and skill exchange.
 
-### Creating Your First Skill
-1. **Register** an account and verify your email
-2. **Login** to your account
-3. **Navigate** to "My Profile" 
-4. **Edit** your personal information
-4. **Add** new skill details (title, description, difficulty, time estimate)
-5. **Upload** images if desired
-6. **Publish** your skill
+## Backlog
 
-### Finding Skills to Learn
-1. Use the **search bar** to find skills by keywords
-2. Apply **filters** by difficulty level or minimum rating
-3. **Browse** through the results
-4. **Click** on a skill to view details
+### 1. Defining the project theme and technologies
+- [X] Defining and researching technologies.
+- [X] Researching possible project themes.
 
-### Starting a Collaboration
-1. **Find** a skill you want to learn
-2. **Send** a skill swap request offering one or more of your skills in exchange
-3. **Wait** for the other user to accept your request
-4. **Start messaging** once the request is accepted
+### 2. Defining main functionalities
+- [X] User Management: Allows users to register, log in, and manage their profile.
+- [X] Skill Management: Allows users to create, edit, and publish skills.
+- [X] Skill Search & Filtering: Allows users to search and filter skills by criteria.
+- [X] Skill Swap Request: Allows users to exchange skills.
+- [X] Collaboration: Allows users to collaborate with each other through chat.
+- [X] Task distribution according to functionalities
+
+### 3. Defining models and initializing the database
+- [X] Defining the database structure.
+- [X] Creating Django models corresponding to the app entities (User, Skill, Conversation, Message, etc.).
+- [X] Updating the PostgreSQL database.
+
+### 4. Creating the Backend and APIs
+- [X] Implementing authentication (register, email verification, login, password reset) with JWT.
+- [X] Creating REST endpoints for each functionality.
+- [X] Testing APIs with Postman.
+
+### 5. Implementing the frontend
+- [X] Creating components for each module.
+- [X] Connecting the frontend to the backend APIs.
+- [X] Adding validations, UI, and UX.
+
+### 6. Setting up CI/CD
+- [X] Implementing automated tests on each commit and PR (Continuous Integration).
+- [X] Automating deployment after CI tests pass (Continuous Deployment).
+- [X] Preparing for production.
+
+### 7. Deployment
+- [X] Deciding infrastructure and deployment (Render).
+- [X] Integrating external services (AWS S3, SMTP Email Service)
+- [X] Documentation.
+
+### 8. Monitoring and maintenance
+- [X] Monitoring performance and optimizations.
+- [X] Fixing bugs and adding new functionalities.
+
+
+## Diagrams  
+
+### Class Diagram
+<div align="left">
+  <img src="https://res.cloudinary.com/dp1nyner3/image/upload/v1757071923/diagrama_clase_ewl3sx.png" width="400" alt="class_diagram" />
+</div>
+
+### Use Case Diagram
+<div align="left">
+  <img src="https://res.cloudinary.com/dp1nyner3/image/upload/v1757071923/diagrama_use_case_u5wpfn.png" width="400" alt="class_diagram" />
+</div>
+
+### Workflow Diagram
+<div align="left">
+  <img src="https://res.cloudinary.com/dvcvu7whi/image/upload/v1757082650/diagrama_workflow_sixmgr.png" width="400" alt="class_diagram" />
+</div>
+
+### Sequence Diagram 
+<div align="left">
+  <img src="https://res.cloudinary.com/dp1nyner3/image/upload/v1757071922/diagrama_sequence_skillswaprequest_m6kix7.png" width="600" alt="class_diagram" />
+</div>
 
 ## Project Setup Guide
 ### Backend Setup
@@ -175,6 +242,69 @@ REACT_APP_API_BASE_URL=http://localhost:8000/api
 npm start
 ```
 Frontend runs at: [http://localhost:3000](http://localhost:3000)
+
+
+## Git Source Control
+
+All my contributions to this project can be viewed on GitHub.  
+I have made over 25 commits, including branch creation, merges, and pull requests.
+
+[My GitHub Contributions](https://github.com/cotigadavid/SkillSwap/graphs/contributors)
+
+
+## Continuous Integration / Automated Testing
+
+This project uses GitHub Actions to run automated tests for the backend (Django REST API) on every push and pull request.
+
+**Status**: You can view the results of automated tests in the [GitHub Actions tab](https://github.com/cotigadavid/SkillSwap/actions).
+
+
+## Bug reporting 
+
+- [Chat Window - Bug #15](https://github.com/cotigadavid/SkillSwap/issues/15)
+- [Edit User Profile - Bug #13](https://github.com/cotigadavid/SkillSwap/issues/13)
+
+
+## Code standards
+
+- Followed [Django code standards](https://docs.djangoproject.com/en/dev/internals/contributing/writing-code/coding-style/)  
+- Followed [React code standards](https://react.dev/reference/rules)
+
+
+## Design Patterns
+
+### Backend (Django REST)
+- **Models** – define data structure.
+- **Views / Serializers** – handle API logic and convert models to JSON.
+- **Data Access Pattern** – Django ORM handles database interactions.
+
+### Frontend (React)
+- **Component Pattern** – Independent and reusable UI components.
+- **Container / Presentational Pattern** – Separates application logic from UI.
+- **Observer Pattern** – State and props update the UI when data changes.
+- **Factory Pattern** – Dynamically generates components or layouts based on props.
+
+
+## AI Models Usage Documentation
+
+During the development of the project, we used various artificial intelligence tools. From the initial phase, we used OpenAI's GPT-4o model to research the technologies we intended to implement and to identify potential project topics. This proved to be very useful in the documentation process, providing us with multiple technological alternatives, clear explanations, and suggestions on how to start development. It also facilitated the drafting of a general project plan and the structuring of the backlog, managing the context of the discussions remarkably well and maintaining the consistency of information throughout several stages of the project research.
+
+Admittedly, the discussion and context were relatively simple at first, and the model performed very well at this stage. However, as we moved into the actual development phase, difficulties began to arise in managing more complex contexts and following more detailed prompts. The model seemed to offer the simplest solution each time, without fully integrating all the requirements or nuances of more sophisticated problems, especially if the context was broad. This highlighted the model's limitations in situations requiring deeper reasoning, planning, and strict adherence to more complex specifications in the given context.
+
+After the official launch of the GPT-5 model for users, we were initially excited, especially after watching the live presentation, which highlighted the model's advantages in web development and its ability to generate an impressive frontend with a single prompt. This was an area we were working on at the time of launch, which raised our expectations.
+
+Unfortunately, we were disappointed. The model seems to be somehow weaker at handling complex prompts compared to previous versions, GPT-4o or GPT-4.1. It had difficulties following detailed requirements and frequently returned unusable output. In addition, when we sent it code and asked it to fix an error, the model rewrote the code in a different way without solving the original problem. In many cases, the problem was addressed with a simpler idea but with a different implementation than the original one, which GPT-5 was unable to see and, in many situations, further complicated.
+
+OpenAI models remain a very useful tool for documentation and research, facilitating the understanding of the concepts and syntax of the technologies used, providing a general framework for their implementation and clear explanations of the code, especially in situations that do not require extensive context.
+
+As an alternative, we used Anthropic's Claude model, specifically the Sonnet 4 version. I can say that it performed better in handling complex prompts because, with a well-detailed prompt, it was able to generate, for example, entire components in React of several hundred lines of code or the complete implementation of an API endpoint. There were situations where errors required understanding a very broad context, such as the link between API enpoints, self-signed digital generated certificates and the browser used in development, which ChatGPT could not solve even after several hours of giving it different prompts. Claude, on the other hand, was able to address them, although it also needed several prompts to cover the full context. Claude seems to handle the history of previous prompts better, while GPT seems to forget them. 
+
+We also had the opportunity to use the Opus 4.1 model (admittedly very few times), which proved to be probably the most powerful AI model used in the development of the project. It follows the instructions in the prompt very precisely, and we used it for both planning and executing larger tasks, demonstrating great attention to logic and context consistency.
+
+Therefore, the Claude models were our favorites for the actual development of the project. Unfortunately, the cost of using these models is very high, so we had a limited number of prompts available, but enough to make rapid progress in the development of the project. If cost were not an issue, our choice would always have been the Opus 4.1 model, which we would use for both project implementation and research and documentation.
+
+As a final model, we also used GitHub Copilot, hoping to be more efficient in writing code through its autocomplete features. We did not notice a significant difference in productivity, as the autocomplete feature is quite aggressive, often inserting more code than necessary, which is often incorrect. The chat feature is also somewhat useful, but we preferred to use ChatGPT or Claude for such interactions. A very useful aspect of Copilot is the ability to quickly switch between multiple models while maintaining the same context.
+
 
 <!-- Contributing -->
 ## Contributors
