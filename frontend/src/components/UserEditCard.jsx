@@ -6,6 +6,8 @@ import SkillEdit from './SkillEdit';
 
 const UserEditCard = ({ user }) => {
     const [skills, setSkills] = useState(user.skills || []);
+    const [firstName, setFirstName] = useState(user.first_name || "");
+    const [lastName, setLastName] = useState(user.last_name || "");
     const [phoneNumber, setPhoneNumber] = useState(user.phone_number);
     const [birthDate, setBirthDate] = useState(user.birth_date);
     const [residingCity, setResidingCity]  = useState(user.residing_city);
@@ -17,6 +19,8 @@ const UserEditCard = ({ user }) => {
             const userId = localStorage.getItem('userId');
 
             const formData = new FormData();
+            formData.append('first_name', firstName);
+            formData.append('last_name', lastName);
             formData.append('phone_number', phoneNumber);
             formData.append('birth_date', birthDate);
             formData.append('residing_city', residingCity);
@@ -29,6 +33,8 @@ const UserEditCard = ({ user }) => {
     };
 
     const handleDiscard = () => {
+        setFirstName(user.first_name || "");
+        setLastName(user.last_name || "");
         setPhoneNumber(user.phone_number || "");
         setBirthDate(user.birth_date || "");
         setResidingCity(user.residing_city || "");
@@ -56,6 +62,27 @@ const UserEditCard = ({ user }) => {
         <div className="bg-white border border-gray-200 rounded-[6px] p-6">
             <h2 className="text-xl font-semibold mb-6 text-gray-900">Edit your information</h2>
             <form onSubmit={handleSave} className="space-y-6">
+                {/*added first name and last name fields*/}
+                <div>
+                    <label className="block mb-2 font-medium text-gray-900">First Name</label>
+                    <input
+                        type="text"
+                        value={firstName}
+                        onChange={(e) => setFirstName(e.target.value)}
+                        required
+                        className="w-full px-4 py-3 border border-gray-300 rounded-[6px] focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all duration-200 text-gray-900"
+                    />
+                </div>
+                <div>
+                    <label className="block mb-2 font-medium text-gray-900">Last Name</label>
+                    <input
+                        type="text"
+                        value={lastName}
+                        onChange={(e) => setLastName(e.target.value)}
+                        required
+                        className="w-full px-4 py-3 border border-gray-300 rounded-[6px] focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all duration-200 text-gray-900"
+                    />
+                </div>
                 <div>
                     <label className="block mb-2 font-medium text-gray-900">Phone Number</label>
                     <input
