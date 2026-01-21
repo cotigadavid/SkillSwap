@@ -6,6 +6,8 @@ import { useNavigate } from "react-router-dom";
 const ChatWindow = () => {
     const inputRef = useRef();
     const messagesEndRef = useRef();
+    const wsRef = useRef(null);
+    const wsOppRef = useRef(null);
     const [messageList, setMessageList] = useState([]);
     const [oppositeConv, setOppositeConv] = useState('');
     const [receiver, setReceiver] = useState('');
@@ -57,32 +59,90 @@ const ChatWindow = () => {
         fetchConv();
     }, [convId]);
 
+    const buildWsUrl = (conversationId) => {
+        const base = (process.env.REACT_APP_WS_BASE_URL || "").replace(/\/+$/, "");
+        return `${base}/ws/chat/${conversationId}/`;
+    };
+
+    const upsertMessage = (incoming) => {
+        setMessageList(prev => {
+            if (prev.some(m => m.id === incoming.id)) return prev;
+            return [...prev, incoming];
+        });
+    };
+
+    const connectWebSocket = (conversationId, ref) => {
+        if (!conversationId) return null;
+        const ws = new WebSocket(buildWsUrl(conversationId));
+        ref.current = ws;
+
+        ws.onmessage = (event) => {
+            try {
+                const payload = JSON.parse(event.data);
+                if (payload?.type === "message" && payload?.data) {
+                    upsertMessage(payload.data);
+                }
+            } catch (err) {
+                console.error("WebSocket message parse error:", err);
+            }
+        };
+
+        ws.onerror = (err) => {
+            console.error("WebSocket error:", err);
+        };
+
+        ws.onclose = () => {
+            if (ref.current === ws) {
+                ref.current = null;
+            }
+        };
+
+        return ws;
+    };
+
+    const sendMessageViaRest = async (message, attachmentKeys) => {
+        const formData = new FormData();
+        formData.append("conversation", parseInt(convId));
+
+        if (message.trim()) {
+            formData.append("text", message);
+        }
+
+        formData.append("is_received", false);
+        formData.append("is_sent", false);
+
+        attachmentKeys.forEach(key => {
+            formData.append("attachment_keys", key);
+        });
+
+        const response = await secureAxios.post('messages/', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+            credentials: 'include',
+        });
+
+        console.log("Message sent successfully:", response);
+
+        await fetchMessage();
+    };
+
     const sendMessage = async (message) => {
         if (!message.trim() && filesArray.length === 0) return;
 
         try {
-            const formData = new FormData();
-            formData.append("conversation", parseInt(convId));
+            let attachmentKeys = [];
 
-            if (message.trim()) {
-                formData.append("text", message);
-            }
-
-            formData.append("is_received", false);
-            formData.append("is_sent", false);
-
-            // only process files if there are any
             if (filesArray.length > 0) {
                 const payload = filesArray.map(file => ({
                     filename: file.name,
                     content_type: file.type
                 }));
 
-                const presigned_urls = (await secureAxios.post("/generate-upload-url/", { files: payload })).data;
+                const presignedUrls = (await secureAxios.post("/generate-upload-url/", { files: payload })).data;
 
-                const attachment_keys = [];
-                for (let i = 0; i < presigned_urls.length; i++) {
-                    const { url, key } = presigned_urls[i];
+                for (let i = 0; i < presignedUrls.length; i++) {
+                    const { url, key } = presignedUrls[i];
                     const file = filesArray[i];
 
                     await fetch(url, {
@@ -91,32 +151,27 @@ const ChatWindow = () => {
                         body: file
                     });
 
-                    attachment_keys.push(key);
+                    attachmentKeys.push(key);
                 }
-
-                attachment_keys.forEach(key => {
-                    formData.append("attachment_keys", key);
-                });
             }
 
-            const response = await secureAxios.post('messages/', formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-                credentials: 'include',
-            });
+            const activeSocket = wsRef.current?.readyState === WebSocket.OPEN ? wsRef.current : null;
 
-            console.log("Message sent successfully:", response);
+            if (activeSocket) {
+                activeSocket.send(JSON.stringify({
+                    type: "message",
+                    text: message.trim(),
+                    attachment_keys: attachmentKeys,
+                }));
+            } else {
+                await sendMessageViaRest(message, attachmentKeys);
+            }
 
-            setFilesArray([]); 
-            
-            // fetch messages immediately after sending
-            await fetchMessage();
-            
+            setFilesArray([]);
+
             setTimeout(() => {
                 messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
             }, 100);
-
         } catch (error) {
             console.error('Error sending message:', error);
             if (error.response) {
@@ -171,6 +226,29 @@ const ChatWindow = () => {
     useEffect(() => {
         fetchMessage();
     }, [oppositeConv]);
+
+    useEffect(() => {
+        if (!convId) return;
+
+        const sockets = [];
+        const mainSocket = connectWebSocket(convId, wsRef);
+        if (mainSocket) sockets.push(mainSocket);
+
+        if (oppositeConv?.id && String(oppositeConv.id) !== String(convId)) {
+            const oppSocket = connectWebSocket(oppositeConv.id, wsOppRef);
+            if (oppSocket) sockets.push(oppSocket);
+        }
+
+        return () => {
+            sockets.forEach(ws => {
+                try {
+                    ws.close();
+                } catch (err) {
+                    console.error("Error closing WebSocket:", err);
+                }
+            });
+        };
+    }, [convId, oppositeConv?.id]);
     
     const getTime = (createdAt) => {
         const time = new Date(createdAt).toLocaleTimeString([], {
