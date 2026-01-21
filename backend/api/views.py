@@ -27,6 +27,8 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView,
 )
 from django.db.models import Q
+from django.core.cache import cache
+from .cache import make_cache_key, invalidate_search_cache
 import boto3
 import uuid
 
@@ -38,10 +40,33 @@ class SkillViewSet(viewsets.ModelViewSet):
     queryset = Skill.objects.all()
     pagination_class = None
 
-    # def get_queryset(self):
-    #     return Skill.objects.filter(user=self.request.user).select_related('user').prefetch_related('reviews')
+    def get_queryset(self):
+        return Skill.objects.select_related('user').prefetch_related('reviews')
 
-    def get_serializer_acontext(self):
+    def list(self, request, *args, **kwargs):
+        cache_key = make_cache_key("skills", "list")
+        cached = cache.get(cache_key)
+        if cached is not None:
+            return Response(cached)
+        
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        cache.set(cache_key, serializer.data, 300)  # 5 min
+        return Response(serializer.data)
+
+    def retrieve(self, request, *args, **kwargs):
+        pk = kwargs.get('pk')
+        cache_key = make_cache_key("skills", "detail", pk)
+        cached = cache.get(cache_key)
+        if cached is not None:
+            return Response(cached)
+        
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        cache.set(cache_key, serializer.data, 600)  # 10 min
+        return Response(serializer.data)
+
+    def get_serializer_context(self):
         return {'request': self.request}
     
     
@@ -219,6 +244,20 @@ class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
     permission_classes = [AllowAny]
 
+    def list(self, request, *args, **kwargs):
+        skill_id = request.query_params.get('skill')
+        cache_key = make_cache_key("reviews", "list", query_params={"skill": skill_id})
+        cached = cache.get(cache_key)
+        if cached is not None:
+            return Response(cached)
+        
+        queryset = self.get_queryset()
+        if skill_id:
+            queryset = queryset.filter(skill_id=skill_id)
+        serializer = self.get_serializer(queryset, many=True)
+        cache.set(cache_key, serializer.data, 300)  # 5 min
+        return Response(serializer.data)
+
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -252,6 +291,19 @@ def markConversationAsReceived(request):
 @api_view(['GET'])
 def search_skills(request):
     query = (request.GET.get('query') or '').strip()
+    page_num = request.GET.get('page', '1')
+    
+    try:
+        page_int = int(page_num)
+    except ValueError:
+        page_int = 1
+    
+    cache_key = None
+    if page_int <= 5:
+        cache_key = make_cache_key("search", query_params={"q": query, "page": page_num})
+        cached = cache.get(cache_key)
+        if cached is not None:
+            return Response(cached)
 
     base_queryset = (
         Skill.objects
@@ -309,7 +361,12 @@ def search_skills(request):
     page = paginator.paginate_queryset(skills, request)
 
     serializer = SkillSerializer(page, many=True, context={'request': request})
-    return paginator.get_paginated_response(serializer.data)
+    response_data = paginator.get_paginated_response(serializer.data).data
+    
+    if cache_key:
+        cache.set(cache_key, response_data, 120)
+    
+    return Response(response_data)
 
 
 class ConfirmEmailView(APIView):
