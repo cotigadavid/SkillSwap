@@ -54,6 +54,14 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         if message_type == "message":
             text = (content.get("text") or "").strip()
             attachment_keys = content.get("attachment_keys") or []
+            attachments = content.get("attachments") or []
+
+            if attachments:
+                await self.send_json({
+                    "type": "error",
+                    "detail": "Direct file upload over WebSocket is disabled. Upload to S3 and send attachment_keys.",
+                })
+                return
 
             if not text and not attachment_keys:
                 await self.send_json({

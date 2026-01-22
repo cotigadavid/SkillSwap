@@ -64,11 +64,19 @@ const ChatWindow = () => {
         return `${base}/ws/chat/${conversationId}/`;
     };
 
-    const upsertMessage = (incoming) => {
-        setMessageList(prev => {
-            if (prev.some(m => m.id === incoming.id)) return prev;
-            return [...prev, incoming];
+    const mergeMessages = (prevMessages, nextMessages) => {
+        const map = new Map();
+        prevMessages.forEach(m => map.set(m.id, m));
+        nextMessages.forEach(m => map.set(m.id, m));
+        return Array.from(map.values()).sort((a, b) => {
+            const aTime = new Date(a.created_at || 0).getTime();
+            const bTime = new Date(b.created_at || 0).getTime();
+            return aTime - bTime;
         });
+    };
+
+    const upsertMessage = (incoming) => {
+        setMessageList(prev => mergeMessages(prev, [incoming]));
     };
 
     const connectWebSocket = (conversationId, ref) => {
@@ -99,6 +107,13 @@ const ChatWindow = () => {
 
         return ws;
     };
+
+    const readFileAsBase64 = (file) => new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+    });
 
     const sendMessageViaRest = async (message, attachmentKeys) => {
         const formData = new FormData();
@@ -131,39 +146,63 @@ const ChatWindow = () => {
         if (!message.trim() && filesArray.length === 0) return;
 
         try {
-            let attachmentKeys = [];
-
-            if (filesArray.length > 0) {
-                const payload = filesArray.map(file => ({
-                    filename: file.name,
-                    content_type: file.type
-                }));
-
-                const presignedUrls = (await secureAxios.post("/generate-upload-url/", { files: payload })).data;
-
-                for (let i = 0; i < presignedUrls.length; i++) {
-                    const { url, key } = presignedUrls[i];
-                    const file = filesArray[i];
-
-                    await fetch(url, {
-                        method: "PUT",
-                        headers: { "Content-Type": file.type },
-                        body: file
-                    });
-
-                    attachmentKeys.push(key);
-                }
-            }
-
             const activeSocket = wsRef.current?.readyState === WebSocket.OPEN ? wsRef.current : null;
 
             if (activeSocket) {
+                let attachmentKeys = [];
+
+                if (filesArray.length > 0) {
+                    const payload = filesArray.map(file => ({
+                        filename: file.name,
+                        content_type: file.type
+                    }));
+
+                    const presignedUrls = (await secureAxios.post("/generate-upload-url/", { files: payload })).data;
+
+                    for (let i = 0; i < presignedUrls.length; i++) {
+                        const { url, key } = presignedUrls[i];
+                        const file = filesArray[i];
+
+                        await fetch(url, {
+                            method: "PUT",
+                            headers: { "Content-Type": file.type },
+                            body: file
+                        });
+
+                        attachmentKeys.push(key);
+                    }
+                }
+
                 activeSocket.send(JSON.stringify({
                     type: "message",
                     text: message.trim(),
                     attachment_keys: attachmentKeys,
                 }));
             } else {
+                let attachmentKeys = [];
+
+                if (filesArray.length > 0) {
+                    const payload = filesArray.map(file => ({
+                        filename: file.name,
+                        content_type: file.type
+                    }));
+
+                    const presignedUrls = (await secureAxios.post("/generate-upload-url/", { files: payload })).data;
+
+                    for (let i = 0; i < presignedUrls.length; i++) {
+                        const { url, key } = presignedUrls[i];
+                        const file = filesArray[i];
+
+                        await fetch(url, {
+                            method: "PUT",
+                            headers: { "Content-Type": file.type },
+                            body: file
+                        });
+
+                        attachmentKeys.push(key);
+                    }
+                }
+
                 await sendMessageViaRest(message, attachmentKeys);
             }
 
@@ -212,7 +251,7 @@ const ChatWindow = () => {
             const filtered = data.filter(mess => 
                 mess.conversation === parseInt(convId) || mess.conversation === parseInt(oppositeConv?.id)
             );
-            setMessageList(filtered);
+            setMessageList(prev => mergeMessages(prev, filtered));
         } catch (error) {
             console.error("Error fetching messages: ", error);
         } finally {
@@ -292,10 +331,19 @@ const ChatWindow = () => {
         setFilesArray(prev => prev.filter((_, i) => i !== index));
     };
     
+    const buildFileUrl = (fileUrl) => {
+        if (!fileUrl) return fileUrl;
+        if (fileUrl.startsWith("http://") || fileUrl.startsWith("https://")) {
+            return fileUrl;
+        }
+        const base = (process.env.AWS_BASE_URL || "").replace(/\/+$/, "");
+        return `${base}/${fileUrl.replace(/^\/+/, "")}`;
+    };
+
     const handleDownload = async (fileUrl, fileName) => {
-        console.log(fileUrl);
+        const resolvedUrl = buildFileUrl(fileUrl);
         try {
-            const response = await secureAxios.get(fileUrl, {
+            const response = await secureAxios.get(resolvedUrl, {
                 responseType: 'blob', 
             });
 
