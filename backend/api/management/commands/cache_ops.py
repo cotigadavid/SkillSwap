@@ -3,16 +3,18 @@ from django.core.cache import cache
 
 
 class Command(BaseCommand):
-    help = 'Cache operations: stats, clear'
+    help = 'Cache operations: stats, clear, warm'
 
     def add_arguments(self, parser):
-        parser.add_argument('action', choices=['stats', 'clear'])
+        parser.add_argument('action', choices=['stats', 'clear', 'warm'])
 
     def handle(self, *args, **options):
         if options['action'] == 'stats':
             self.show_stats()
         elif options['action'] == 'clear':
             self.clear_cache()
+        elif options['action'] == 'warm':
+            self.warm_cache()
 
     def show_stats(self):
         try:
@@ -31,7 +33,11 @@ class Command(BaseCommand):
             self.stdout.write(f"Hit Rate: {hit_rate:.1f}%")
             
             search_keys = len(list(redis_client.scan_iter(match="*search*", count=100)))
-            self.stdout.write(f"Cached searches: {search_keys}\n")
+            skill_keys = len(list(redis_client.scan_iter(match="*skills*", count=100)))
+            user_keys = len(list(redis_client.scan_iter(match="*user*", count=100)))
+            request_keys = len(list(redis_client.scan_iter(match="*requests*", count=100)))
+            
+            self.stdout.write(f"Cached: {search_keys} searches, {skill_keys} skills, {user_keys} users, {request_keys} requests\n")
             
         except Exception as e:
             self.stdout.write(self.style.ERROR(f"Error: {e}"))
@@ -39,3 +45,12 @@ class Command(BaseCommand):
     def clear_cache(self):
         cache.clear()
         self.stdout.write(self.style.SUCCESS("Cache cleared!"))
+    
+    def warm_cache(self):
+        from api.cache import warm_cache
+        
+        self.stdout.write("Warming cache...")
+        if warm_cache():
+            self.stdout.write(self.style.SUCCESS("Cache warmed successfully!"))
+        else:
+            self.stdout.write(self.style.ERROR("Failed to warm cache"))

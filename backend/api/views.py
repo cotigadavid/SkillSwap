@@ -51,7 +51,7 @@ class SkillViewSet(viewsets.ModelViewSet):
         
         queryset = self.get_queryset()
         serializer = self.get_serializer(queryset, many=True)
-        cache.set(cache_key, serializer.data, 300)  # 5 min
+        cache.set(cache_key, serializer.data, 300)  
         return Response(serializer.data)
 
     def retrieve(self, request, *args, **kwargs):
@@ -63,7 +63,7 @@ class SkillViewSet(viewsets.ModelViewSet):
         
         instance = self.get_object()
         serializer = self.get_serializer(instance)
-        cache.set(cache_key, serializer.data, 600)  # 10 min
+        cache.set(cache_key, serializer.data, 600)  
         return Response(serializer.data)
 
     def get_serializer_context(self):
@@ -105,21 +105,33 @@ class SkillSwapRequestViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['get'])
     def received(self, request):
+        cache_key = make_cache_key("requests", "received", request.user.id)
+        cached = cache.get(cache_key)
+        if cached is not None:
+            return Response(cached)
+        
         trade_requests = self.get_queryset().filter(
             receiver=request.user,
             status='pending'
         )
 
         serializer = self.get_serializer(trade_requests, many=True)
+        cache.set(cache_key, serializer.data, 120)  
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     @action(detail=False, methods=['get'])
     def sent(self, request):
+        cache_key = make_cache_key("requests", "sent", request.user.id)
+        cached = cache.get(cache_key)
+        if cached is not None:
+            return Response(cached)
+        
         trade_requests = self.get_queryset().filter(
             sender=request.user,
         )
 
         serializer = self.get_serializer(trade_requests, many=True)
+        cache.set(cache_key, serializer.data, 120)  
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['patch'])
@@ -181,7 +193,13 @@ class CustomUserViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
     def me(self, request):
+        cache_key = make_cache_key("user", "profile", request.user.id)
+        cached = cache.get(cache_key)
+        if cached is not None:
+            return Response(cached)
+        
         serializer = self.get_serializer(request.user)
+        cache.set(cache_key, serializer.data, 180)  
         return Response(serializer.data)
 
 class ConversationViewSet(viewsets.ModelViewSet):
@@ -255,7 +273,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
         if skill_id:
             queryset = queryset.filter(skill_id=skill_id)
         serializer = self.get_serializer(queryset, many=True)
-        cache.set(cache_key, serializer.data, 300)  # 5 min
+        cache.set(cache_key, serializer.data, 300)  
         return Response(serializer.data)
 
 

@@ -46,3 +46,23 @@ def invalidate_skills_cache():
 
 def invalidate_reviews_cache():
     invalidate_pattern(f"{CACHE_VERSION}:reviews:*")
+
+
+def invalidate_user_cache(user_id):
+    invalidate_pattern(f"{CACHE_VERSION}:user:*:{user_id}*")
+    invalidate_pattern(f"{CACHE_VERSION}:requests:*:{user_id}*")
+
+
+def warm_cache():
+    from django.core.cache import cache
+    from .models import Skill
+    from .serializers import SkillSerializer
+    
+    try:
+        skills = Skill.objects.select_related('user').prefetch_related('reviews')[:50]
+        cache_key = make_cache_key("skills", "list")
+        serializer = SkillSerializer(skills, many=True)
+        cache.set(cache_key, serializer.data, 300)
+        return True
+    except Exception:
+        return False
