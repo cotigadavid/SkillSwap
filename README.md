@@ -41,12 +41,15 @@ SkillSwap is a platform that enables users to share skills and teach each other 
 <!-- TechStack -->
 ### Tech Stack
 - **Backend**: [Django REST Framework](https://www.django-rest-framework.org/)
+- **WebSockets**: [Django Channels](https://channels.readthedocs.io/)
 - **Frontend**: [React.js](https://reactjs.org/)
 - **Styling**: [TailwindCSS](https://tailwindcss.com/)
 - **Database**: [PostgreSQL](https://www.postgresql.org/)
+- **Caching**: [Redis](https://redis.io/)
+- **Task Queue**: [Celery](https://docs.celeryq.dev/)
 - **Authentication**: JWT (JSON Web Tokens)
 - **File Storage**: AWS S3
-- **Email**: SMTP Email Service
+- **Email**: SMTP Email Service (async via Celery)
 
 <!-- Features -->
 ## Features
@@ -135,22 +138,46 @@ DATABASE_URL=your_database_url
 SECRET_KEY=your_django_secret_key
 DEBUG=True
 ALLOWED_HOSTS=localhost,127.0.0.1
-FRONTEND_URL=http://localhost:3000
-BACKEND_URL=http://localhost:8000
+FRONTEND_URL=https://localhost:3000
+BACKEND_URL=https://localhost:8000
 EMAIL_HOST_USER=your_email_host_user
 EMAIL_PASSWORD=your_email_password
 AWS_ACCESS_KEY_ID=your_aws_access_key
 AWS_SECRET_ACCESS_KEY=your_aws_secret_key
 AWS_STORAGE_BUCKET_NAME=your_s3_bucket_name
+REDIS_URL=redis://127.0.0.1:6379/1
 ```
 
-#### Run migrations and start server:
+#### Run migrations:
 ```bash
 python manage.py makemigrations
 python manage.py migrate
-python manage.py runserver
 ```
-Backend runs at: [http://localhost:8000](http://localhost:8000)
+
+#### Start the ASGI server with Daphne (HTTPS):
+```bash
+daphne -e ssl:8000:privateKey=localhost+2-key.pem:certKey=localhost+2.pem backend.asgi:application
+```
+Backend runs at: [https://localhost:8000](https://localhost:8000)
+
+**Alternative (HTTP only):**
+```bash
+daphne -b 0.0.0.0 -p 8000 backend.asgi:application
+```
+
+#### Start Celery worker:
+```bash
+cd backend
+source venv/bin/activate  # or venv\Scripts\activate on Windows
+celery -A backend worker --loglevel=info
+```
+
+**Note**: 
+- SSL certificates (`localhost+2.pem`, `localhost+2-key.pem`) are included for HTTPS local development
+- Redis must be running locally for caching, Celery task queue, and WebSocket channel layers:
+  - **Linux/macOS**: `sudo apt-get install redis-server` or `brew install redis`, then `redis-server`
+  - **Windows**: Use [Redis for Windows](https://github.com/microsoftarchive/redis/releases) or WSL
+- HTTPS is recommended to match production and enable secure WebSocket connections (`wss://`)
 
 ---
 
@@ -167,14 +194,17 @@ npm install
 #### Add environment variables:
 Create a `.env` file in the `/frontend` directory:
 ```env
-REACT_APP_API_BASE_URL=http://localhost:8000/api
+REACT_APP_API_BASE_URL=https://localhost:8000/api
+HTTPS=true
+SSL_CRT_FILE=../backend/localhost+2-key.pem
+SSL_KEY_FILE=../backend/localhost+2.pem
 ```
 
 #### Start React development server:
 ```bash
 npm start
 ```
-Frontend runs at: [http://localhost:3000](http://localhost:3000)
+Frontend runs at: [https://localhost:3000](https://localhost:3000)
 
 <!-- Contributing -->
 ## Contributors
