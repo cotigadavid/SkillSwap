@@ -86,7 +86,7 @@ class Message(models.Model):
 
 class MessageAttachment(models.Model):
     message = models.ForeignKey(Message, on_delete=models.CASCADE, related_name="attachments")
-    file = models.FileField(upload_to='messages/')
+    file = models.FileField()
     filename = models.CharField(max_length=100, default='file')
     uploaded_at = models.DateTimeField(auto_now_add=True)
 
